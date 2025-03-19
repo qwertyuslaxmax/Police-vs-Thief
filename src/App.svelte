@@ -192,14 +192,6 @@
 
 <h1>{trustTheProcess}</h1>
 <h1>{trustTheProcess}</h1>
-<h1>{trustTheProcess}</h1>
-<h1>{trustTheProcess}</h1>
-<h1>{trustTheProcess}</h1>
-<h1>{trustTheProcess}</h1>
-<h1>{trustTheProcess}</h1>
-<h1>{trustTheProcess}</h1>
-<h1>{trustTheProcess}</h1>
-<h1>{trustTheProcess}</h1>
 <h3>Police 1 Location: {police1.location}</h3>
 <h3>Police 2 Location: {police2.location}</h3>
 <h1>{trustTheProcess}</h1>
