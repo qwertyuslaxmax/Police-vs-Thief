@@ -2,18 +2,21 @@
     import {borders} from "./borders";
     import {getBorderingCountries} from "./borders"
     import {toProperCase} from "./randomFunctions"
+    import {pickRandomCountries} from "./randomFunctions"
 
-    let gameState = "thiefSelection";
-    let thiefDisplay = "";
-    let errorMessage = "";
-    let turnNumber = 0;
+    let gameState = "thiefSelection"; //Determines whose move it is
+    let thiefDisplay = ""; //What is displayed to the police officers
+    let errorMessage = ""; //Universal usage error message
+    let turnNumber = 0; //Keeps track of # of turns (used for thiefDisplay)
 
-    let prepare = 0;
-    let trustTheProcess = "‎";
-    let thiefInput = "";
-    let thiefCountry = "";
-    let thiefSelectedCountry = "";
-    let thiefPrevious = "";
+    let prepare = 0; //Variable that represents readiness for robbery
+    let cash = 150; //Used for moving as well as end goal (tbi)
+    let trustTheProcess = "‎"; //trust me
+    let thiefInput = ""; //used for storing thief's input
+    let failedRobbery = false; //Currently not useful. Feature to display error message and also used for detaining
+    let thiefCountry = ""; //Self Explanatory
+    let thiefSelectedCountry = ""; //Temp Variable used as middleman between html and js
+    let thiefPrevious = ""; //Self Explanatory
     $: thiefBorderingCountries = thiefCountry ? [thiefCountry, ...getBorderingCountries(thiefCountry)] : [];
 
     function thiefHandleSubmitInput() {
@@ -29,24 +32,134 @@
         }
     }
 
-    function thiefHandleSubmitDropdown() {
-        turnNumber += 1;
-        thiefPrevious = thiefCountry;
-        thiefCountry = thiefSelectedCountry;
+    let bossLocations = pickRandomCountries();
+    
+    function getBossHome(){
+        let countries = pickRandomCountries(); // Get the list of random countries
+        let bossHome = countries[Math.floor(Math.random() * countries.length)]; // Pick one at random
+        if(bossLocations.includes(bossHome)){
+            return getBossHome();
+        }
+        return bossHome;
+    }
 
-        if(turnNumber % 3 == 0){
-            thiefDisplay = thiefPrevious;
-        } else {
-            thiefDisplay = "???"
+    let bossHome = getBossHome();
+
+    function rob() {
+
+        let successRate = 0;
+
+        if (prepare >= 1 && bossLocations.includes(thiefCountry)) {
+            successRate = 0.95;
+        } else if (prepare == 1 && !bossLocations.includes(thiefCountry)) {
+            successRate = 0.50;
+        } else if (prepare >= 2 && !bossLocations.includes(thiefCountry)) {
+            successRate = 0.95;
+        } else if (prepare == 0 && bossLocations.includes(thiefCountry)) {
+            successRate = 0.60;
+        } else if (prepare == 0 && !bossLocations.includes(thiefCountry)) {
+            successRate = 0.10;
         }
 
-        if (thiefCountry == police1.location || thiefCountry == police2.location){
+        return Math.random() < successRate; // Returns true if robbery succeeds, false if it fails
+    }
+
+    let negativePrepareError = "";
+    let robbedCountries: string[] = [];
+    let alreadyRobbedError = "";
+    let varA = true;
+
+    function thiefHandleRobbery() {
+        if (robbedCountries.includes(thiefCountry)){
+            alreadyRobbedError = "Already Robbed this Country";
+            setTimeout(() => (alreadyRobbedError = ""), 3000);
+            return;
+        }
+        if (prepare < 0) {
+            negativePrepareError = "Prepare can't be negative!";
+            setTimeout(() => (negativePrepareError = ""), 3000);
+            return;
+        }
+
+        if (rob()) {
+            cash += 150;
+            robbedCountries = [...robbedCountries, thiefCountry];
+            failedRobbery = false;
+        } else {
+            failedRobbery = true;
+            if(thiefCountry == "North Korea") {
+                varA = false;
+            }
+        }
+
+        prepare = -5;
+
+        if (varA == false) {
+            gameState = "KimJongUn";
+            return;
+        }
+    }
+
+    let numberA = 0;
+
+    function thiefHandleSubmitDropdown() {
+
+        turnNumber += 1;
+        thiefPrevious = thiefCountry;
+        
+        if(thiefSelectedCountry == "skip"){
+            thiefDisplay = thiefCountry;
+            gameState = "policeMove1";
+            if(numberA == 1){
+                failedRobbery = false;
+                numberA = 0;
+            } else if(numberA == 0){
+                failedRobbery = true;
+                numberA += 1;
+            }
+            return;
+        }
+
+        thiefCountry = thiefSelectedCountry;
+
+        if (thiefPrevious !== thiefCountry) {
+            if (cash >= 10) {
+                cash -= 10;
+            } else {
+                errorMessage = "Not enough cash to move!";
+                setTimeout(() => (errorMessage = ""), 3000);
+                thiefCountry = thiefPrevious;
+                return;
+            }
+        }
+
+        if (prepare < 0) {
+            prepare += 1;
+        } else if (prepare >= 0 && thiefPrevious != thiefCountry) {
+            prepare = 0;
+        } else if (prepare >= 0 && thiefPrevious == thiefCountry) {
+            prepare += 1;
+        }
+
+        if (turnNumber % 3 == 0) {
+            thiefDisplay = thiefPrevious;
+        } else {
+            thiefDisplay = "???";
+        }
+
+        if (thiefCountry == police1.location || thiefCountry == police2.location) {
             gameState = "policeWin";
             return;
         }
 
-        gameState = "policeMove1";
+        if (thiefCountry == bossHome && cash >= 800){
+            gameState = "thiefWin";
+            return;
+        }
+
+        gameState = "policeMove1"; // Next step after thief's move
     }
+
 
     class Police {
         name: string;
@@ -146,12 +259,37 @@
 {#if gameState === "thiefMove"}
     <label for="country-dropdown">Your move:</label>
     <select id="country-dropdown" bind:value={thiefSelectedCountry}>
-        {#each thiefBorderingCountries as country}
-            <option value={country}>{country}</option>
-        {/each}
+        {#if failedRobbery}
+            <option value="skip">Skip</option>
+        {:else}
+            {#each thiefBorderingCountries as country}
+                <option value={country}>{country}</option>
+            {/each}
+        {/if}
     </select>
     <button on:click={thiefHandleSubmitDropdown}>Submit Move</button>
+
+    <!-- Robbery Button -->
+    <button on:click={thiefHandleRobbery} disabled={prepare < 0}>Rob</button>
+
+    <!-- Display if robbery failed -->
+    {#if failedRobbery}
+        <p style="color: red;">The robbery failed!</p>
+    {/if}
+
+    <!-- Display cash -->
+    <p>Cash: ${cash}</p>
+    <p>Boss Locations:</p>
+    <ul>
+        {#each bossLocations as location}
+            <li>{location}</li>
+        {/each}
+    </ul>
+
+    <h1>{trustTheProcess}</h1>
+    <h3>Boss Home: {bossHome}</h3>
 {/if}
+
 
 {#if gameState === "policeSelection"}
     <label for="text-input">Thief Country: {thiefCountry}<br><br>Enter starting country for {`Police ${currentPoliceIndex + 1}`}:</label>
@@ -189,6 +327,25 @@
     <h1>Imagine Losing</h1>
 {/if}
 
+{#if gameState === "KimJongUn"}
+    <h1>R.I.P thief 🪦💀</h1>
+    <h1>Executed in North Korea for a robbery against the state</h1>
+    <h1>Kim Jong Un seized all assets and refuses to return stolen money 🗿🗿🗿⚔️⚔️⚔️</h1>
+{/if}
+
+{#if gameState === "thiefWin"}
+    <h1>Interpol Lost</h1>
+    <h1>Boss and the thief are now both richer than all of your salaries combined</h1>
+    <h1>Imagine Losing! Haha!</h1>
+{/if}
+
+{#if negativePrepareError}
+    <p style="color: red;">{negativePrepareError}</p>
+{/if}
+
+{#if alreadyRobbedError}
+    <p style="color: red;">{alreadyRobbedError}</p>
+{/if}
 
 <h1>{trustTheProcess}</h1>
 <h1>{trustTheProcess}</h1>
@@ -196,6 +353,10 @@
 <h3>Police 2 Location: {police2.location}</h3>
 <h1>{trustTheProcess}</h1>
 <h3>Thief Last Location: {thiefDisplay}</h3>
+
+{#if gameState === "thiefMove"}
+    <h3>Prepare: {prepare}</h3>
+{/if}
 
 <style>
 
