@@ -177,6 +177,12 @@
         }
     }
 
+    let maskScreen = false;
+
+    function removeMask() {
+        maskScreen = false;  // Remove black screen when clicked
+    }
+
     let policeInput = "";
     let currentPoliceIndex = 0;
     let police1selectedCountry = "";
@@ -245,6 +251,7 @@
             return;
         }
 
+        maskScreen = true;
         gameState = "thiefMove"
     }
 
@@ -357,6 +364,34 @@
 {#if gameState === "thiefMove"}
     <h3>Prepare: {prepare}</h3>
 {/if}
+
+{#if maskScreen}
+    <div 
+        role="button" 
+        tabindex="0"
+        on:click={removeMask} 
+        on:keydown={(e) => (e.key === "Enter" || e.key === " ") && removeMask()}
+        style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        "
+    >
+        Tap or Click to Continue
+    </div>
+{/if}
+
+
 
 <style>
 
