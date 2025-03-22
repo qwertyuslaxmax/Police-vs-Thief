@@ -232,12 +232,20 @@
         }
     }
 
+    let varB = false;
+
     function police1handleSubmit(){
         police1.location = police1selectedCountry;
 
         if (thiefCountry == police1.location || thiefCountry == police2.location){
             gameState = "policeWin";
             return;
+        }
+
+        if (robbedCountries.includes(police1.location) || robbedCountries.includes(police2.location)) {
+            varB = true;
+        } else {
+            varB = false;
         }
 
         gameState = "policeMove2"
@@ -249,6 +257,12 @@
         if (thiefCountry == police1.location || thiefCountry == police2.location){
             gameState = "policeWin";
             return;
+        }
+
+        if (robbedCountries.includes(police1.location) || robbedCountries.includes(police2.location)) {
+            varB = true;
+        } else {
+            varB = false;
         }
 
         maskScreen = true;
@@ -363,6 +377,11 @@
 
 {#if gameState === "thiefMove"}
     <h3>Prepare: {prepare}</h3>
+{/if}
+
+{#if varB}
+    <p>This country was robbed</p>
+    <p>Thief Cash: ${cash}</p>
 {/if}
 
 {#if maskScreen}

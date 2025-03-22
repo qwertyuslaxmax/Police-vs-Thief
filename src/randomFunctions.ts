@@ -14,6 +14,7 @@ export function toProperCase(str: string): string {
         case "new zealand": return "New Zealand";
         case "usa": return "USA";
         case "costa rica": return "Costa Rica";
+        case "cote d'ivoire": return "Cote d'Ivoire"
     }
 
     return str
