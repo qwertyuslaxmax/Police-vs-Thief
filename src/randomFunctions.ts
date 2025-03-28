@@ -26,20 +26,15 @@ export function toProperCase(str: string): string {
 function shuffleArray(array: string[]): string[] {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
 }
 
 // Function to pick 10 random countries from the borders object
 export function pickRandomCountries(): string[] {
-    // Get all country names from the borders object (keys of the object)
     const countries = Object.keys(borders);
-    
-    // Shuffle the countries array
     const shuffledCountries = shuffleArray(countries);
-    
-    // Select the first 10 countries
     const selectedCountries = shuffledCountries.slice(0, 10);
     
     return selectedCountries;

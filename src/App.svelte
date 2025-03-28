@@ -1,23 +1,96 @@
 <script lang="ts">
     import {borders} from "./borders";
-    import {getBorderingCountries} from "./borders"
-    import {toProperCase} from "./randomFunctions"
-    import {pickRandomCountries} from "./randomFunctions"
+    import {getBorderingCountries} from "./borders";
+    import {toProperCase} from "./randomFunctions";
+    import {pickRandomCountries} from "./randomFunctions";
+    import {coords} from './coords';
+    import type { LatLngExpression } from "leaflet";
+    import Leaflet from './lib/Leaflet.svelte'
+    import Marker from './lib/Marker.svelte';
+	//import Popup from './lib/Popup.svelte';
 
     let gameState = "thiefSelection"; //Determines whose move it is
     let thiefDisplay = ""; //What is displayed to the police officers
     let errorMessage = ""; //Universal usage error message
     let turnNumber = 0; //Keeps track of # of turns (used for thiefDisplay)
+    let force = 0;
 
     let prepare = 0; //Variable that represents readiness for robbery
     let cash = 150; //Used for moving as well as end goal (tbi)
     let trustTheProcess = "‎"; //trust me
     let thiefInput = ""; //used for storing thief's input
-    let failedRobbery = false; //Currently not useful. Feature to display error message and also used for detaining
+    let failedRobbery = false; //Feature to display error message and also used for detaining
     let thiefCountry = ""; //Self Explanatory
     let thiefSelectedCountry = ""; //Temp Variable used as middleman between html and js
     let thiefPrevious = ""; //Self Explanatory
     $: thiefBorderingCountries = thiefCountry ? [thiefCountry, ...getBorderingCountries(thiefCountry)] : [];
+
+    class Police {
+        name: string;
+        location: string;
+        turnNumber: number;
+        
+        constructor(name: string, location: string, turnNumber: number) {
+            this.name = name;
+            this.location = location;
+            this.turnNumber = turnNumber;
+        }
+
+        get borderingCountries(): string[] {
+            return this.location ? [this.location, ...getBorderingCountries(this.location)] : [];
+        }
+    }
+
+    const initialView: LatLngExpression = [42.62711, -70.58948]
+
+    let thiefCountryMarker: Array<LatLngExpression> = [
+        [42.62711, -70.58948], //Default location
+    ];
+
+    $: policeMarkers = [
+        police1.location && coords[police1.location] ? [coords[police1.location][0], coords[police1.location][1]] : [0, 0],
+        police2.location && coords[police2.location] ? [coords[police2.location][0], coords[police2.location][1]] : [0, 0]
+    ];
+
+    let policeThiefPreviousMarker: Array<LatLngExpression> = [
+        [0, 0]
+    ]
+
+    $: {
+        if (thiefCountry && coords[thiefCountry]) {
+            thiefCountryMarker[0] = [coords[thiefCountry][0], coords[thiefCountry][1]];
+        } else {
+            thiefCountryMarker[0] = [0, 0];
+        }
+    }
+
+    $: {
+        if (thiefPrevious && coords[thiefPrevious]) {
+            policeThiefPreviousMarker[0] = [coords[thiefPrevious][0], coords[thiefPrevious][1]];
+        } else {
+            policeThiefPreviousMarker[0] = [0, 0];
+        }
+    }
+
+    $: {
+        if (police1.location && coords[police1.location]) {
+            policeMarkers = [
+                [coords[police1.location][0], coords[police1.location][1]],
+                policeMarkers[1] // Keep the second marker as is
+            ];
+        }
+    }
+
+    $: {
+        if (police2.location && coords[police2.location]) {
+            policeMarkers = [
+                policeMarkers[0], // Keep the first marker as is
+                [coords[police2.location][0], coords[police2.location][1]]
+            ];
+        }
+    }
+
+
 
     function thiefHandleSubmitInput() {
         let thiefInputLowercase = toProperCase(thiefInput);
@@ -158,23 +231,10 @@
         }
 
         gameState = "policeMove1"; // Next step after thief's move
-    }
 
-
-    class Police {
-        name: string;
-        location: string;
-        turnNumber: number;
-        
-        constructor(name: string, location: string, turnNumber: number) {
-            this.name = name;
-            this.location = location;
-            this.turnNumber = turnNumber;
-        }
-
-        get borderingCountries(): string[] {
-            return this.location ? [this.location, ...getBorderingCountries(this.location)] : [];
-        }
+        console.log('thiefCountry:', thiefCountry);
+        console.log('coords[thiefCountry]:', coords[thiefCountry]);
+        console.log(coords["New Zealand"]);  // Test with a known key
     }
 
     let maskScreen = false;
@@ -288,18 +348,18 @@
             {/each}
         {/if}
     </select>
-    <button on:click={thiefHandleSubmitDropdown}>Submit Move</button>
+    <button class = "confirmChoiceThief" on:click={thiefHandleSubmitDropdown}>Confirm Choice</button>
 
-    <!-- Robbery Button -->
-    <button on:click={thiefHandleRobbery} disabled={prepare < 0}>Rob</button>
+    <button on:click={thiefHandleRobbery} disabled={prepare < 0}>Rob {thiefCountry}</button>
 
-    <!-- Display if robbery failed -->
     {#if failedRobbery}
         <p style="color: red;">The robbery failed!</p>
     {/if}
 
-    <!-- Display cash -->
     <p>Cash: ${cash}</p>
+    <p>Turn Number: {turnNumber}</p>
+    <p>Prepare: {prepare}</p>
+
     <p>Boss Locations:</p>
     <ul>
         {#each bossLocations as location}
@@ -309,8 +369,10 @@
 
     <h1>{trustTheProcess}</h1>
     <h3>Boss Home: {bossHome}</h3>
-{/if}
 
+    <h3>Police 1 Location: {police1.location}</h3>
+    <h3>Police 2 Location: {police2.location}</h3>
+{/if}
 
 {#if gameState === "policeSelection"}
     <label for="text-input">Thief Country: {thiefCountry}<br><br>Enter starting country for {`Police ${currentPoliceIndex + 1}`}:</label>
@@ -326,6 +388,7 @@
         {/each}
     </select>
     <button on:click={police1handleSubmit}>Submit Move</button>
+    <h3>Thief Last Location: {thiefDisplay}</h3>
 {/if}
 
 {#if gameState === "policeMove2"}
@@ -336,10 +399,20 @@
         {/each}
     </select>
     <button on:click={police2handleSubmit}>Submit Move</button>
+
+    <h3>Thief Last Location: {thiefDisplay}</h3>
 {/if}
 
 {#if errorMessage}
     <p style="color: red;">{errorMessage}</p>
+{/if}
+
+{#if negativePrepareError}
+    <p style="color: red;">{negativePrepareError}</p>
+{/if}
+
+{#if alreadyRobbedError}
+    <p style="color: red;">{alreadyRobbedError}</p>
 {/if}
 
 {#if gameState === "policeWin"}
@@ -360,25 +433,6 @@
     <h1>Imagine Losing! Haha!</h1>
 {/if}
 
-{#if negativePrepareError}
-    <p style="color: red;">{negativePrepareError}</p>
-{/if}
-
-{#if alreadyRobbedError}
-    <p style="color: red;">{alreadyRobbedError}</p>
-{/if}
-
-<h1>{trustTheProcess}</h1>
-<h1>{trustTheProcess}</h1>
-<h3>Police 1 Location: {police1.location}</h3>
-<h3>Police 2 Location: {police2.location}</h3>
-<h1>{trustTheProcess}</h1>
-<h3>Thief Last Location: {thiefDisplay}</h3>
-
-{#if gameState === "thiefMove"}
-    <h3>Prepare: {prepare}</h3>
-{/if}
-
 {#if varB}
     <p>This country was robbed</p>
     <p>Thief Cash: ${cash}</p>
@@ -386,31 +440,42 @@
 
 {#if maskScreen}
     <div 
+        class="mask-screen"
         role="button" 
         tabindex="0"
         on:click={removeMask} 
         on:keydown={(e) => (e.key === "Enter" || e.key === " ") && removeMask()}
-        style="
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: black;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-        "
     >
-        Tap or Click to Continue
+        Transfer Device to Thief.<br>click or tap to dismiss
     </div>
 {/if}
 
+<h1>{trustTheProcess}</h1>
 
+<div class="map">
+    <Leaflet view={initialView} zoom={17}>
+        {#if gameState=="thiefMove"}
+            {#each thiefCountryMarker as latLng}
+                <Marker {latLng}></Marker>
+            {/each}
+            {#each policeMarkers as latLng}
+                <Marker {latLng}></Marker>
+            {/each}
+        {/if}
+        {#if gameState=="policeMove1" || gameState=="policeMove2"}
+            {#if thiefDisplay in borders}
+                {#each policeThiefPreviousMarker as latLng}
+                    <Marker {latLng}></Marker>
+                {/each}
+            {/if}
+            {#each policeMarkers as latLng}
+                <Marker {latLng}></Marker>
+            {/each}
+        {/if}
+    </Leaflet>
+</div>
+
+<h1>{trustTheProcess}</h1>
 
 <style>
 
