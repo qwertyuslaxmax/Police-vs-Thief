@@ -748,21 +748,6 @@
     <p>Thief Cash: ${cash}</p>
 {/if}
 
-{#if gameState === "thiefSelection" || gameState === "policeSelection"}
-    <div class="multiplayer-popup">
-        <div class="popup-content">
-            <h3>🎮 Local Multiplayer Hotseat Game</h3>
-            <p>This is a local multiplayer game where players take turns on the same device:</p>
-            <ol>
-                <li>Player 1: You are the thief trying to rob countries and escape</li>
-                <li>Player 2: You control two police officers trying to catch the thief</li>
-                <li>After each player's turn, pass the device to the other player</li>
-                <li>The game continues until either the thief is caught or escapes</li>
-            </ol>
-        </div>
-    </div>
-{/if}
-
 {#if maskScreen}
     <div 
         class="mask-screen"
