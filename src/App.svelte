@@ -268,7 +268,6 @@
 
             if (currentPoliceIndex == 1){
                 police2.location = policeInputProper;
-                maskScreen = true;
                 gameState = "thiefMove"
                 return;
             }
@@ -326,8 +325,8 @@
     <div class="panel info-panel">
         <div class="panel-content">
             <h2>Game Information</h2>
-
-{#if gameState === "thiefMove"}
+            
+            {#if gameState === "thiefMove"}
                 <div class="info-section">
                     <h3>Your Location</h3>
                     <p class="location">{thiefCountry}</p>
@@ -378,15 +377,15 @@
                 <div class="input-section">
                     <h2>Your Move</h2>
                     <div class="input-group">
-    <select id="country-dropdown" bind:value={thiefSelectedCountry}>
-        {#if failedRobbery}
-            <option value="skip">Skip</option>
-        {:else}
-            {#each thiefBorderingCountries as country}
-                <option value={country}>{country}</option>
-            {/each}
-        {/if}
-    </select>
+                        <select id="country-dropdown" bind:value={thiefSelectedCountry}>
+                            {#if failedRobbery}
+                                <option value="skip">Skip</option>
+                            {:else}
+                                {#each thiefBorderingCountries as country}
+                                    <option value={country}>{country}</option>
+                                {/each}
+                            {/if}
+                        </select>
                         <button on:click={thiefHandleSubmitDropdown}>Confirm Move</button>
                     </div>
                     <button 
@@ -423,11 +422,6 @@
                             </div>
                         </div>
                     </div>
-                    {#if turnNumber > 0}
-                        <div class="map-reminder">
-                            Remember to reset the map view if needed!
-                        </div>
-    {/if}
                 </div>
             {:else if gameState === "policeSelection"}
                 <div class="input-section">
@@ -440,34 +434,34 @@
                             bind:value={policeInput}
                             placeholder="Enter country name..."
                         />
-    <button on:click={policeHandleSubmitInput}>Submit</button>
+                        <button on:click={policeHandleSubmitInput}>Submit</button>
                     </div>
                 </div>
             {:else if gameState === "policeMove1"}
                 <div class="input-section">
                     <h2>Police 1 Move</h2>
                     <div class="input-group">
-    <select id="country-dropdown" bind:value={police1selectedCountry}>
-        {#each police1BorderingCountries as country}
-            <option value={country}>{country}</option>
-        {/each}
-    </select>
-    <button on:click={police1handleSubmit}>Submit Move</button>
+                        <select id="country-dropdown" bind:value={police1selectedCountry}>
+                            {#each police1BorderingCountries as country}
+                                <option value={country}>{country}</option>
+                            {/each}
+                        </select>
+                        <button on:click={police1handleSubmit}>Submit Move</button>
                     </div>
                 </div>
             {:else if gameState === "policeMove2"}
                 <div class="input-section">
                     <h2>Police 2 Move</h2>
                     <div class="input-group">
-    <select id="country-dropdown" bind:value={police2selectedCountry}>
-        {#each police2BorderingCountries as country}
-            <option value={country}>{country}</option>
-        {/each}
-    </select>
-    <button on:click={police2handleSubmit}>Submit Move</button>
+                        <select id="country-dropdown" bind:value={police2selectedCountry}>
+                            {#each police2BorderingCountries as country}
+                                <option value={country}>{country}</option>
+                            {/each}
+                        </select>
+                        <button on:click={police2handleSubmit}>Submit Move</button>
                     </div>
                 </div>
-{/if}
+            {/if}
 
             {#if errorMessage || negativePrepareError || alreadyRobbedError}
                 <div class="notification-container">
@@ -549,7 +543,7 @@
                         {:else if gameState === "policeSelection" || gameState === "policeMove1" || gameState === "policeMove2"}
                             <p>Welcome to the Bordering Countries Game! As the police, here's how to play:</p>
                             <ol>
-                                <li>You are/control two police officers trying to catch a thief.</li>
+                                <li>You are two police officers trying to catch a thief.</li>
                                 <li>You can only move to countries that border your current location.</li>
                                 <li>Every 3 turns, you'll see the thief's location.</li>
                                 <li>If either of you catches the thief, you win!</li>
@@ -696,7 +690,7 @@
                                     </svg>
                                 </Marker>
                             {/each}
-{/if}
+                        {/if}
                         {#each policeMarkers as latLng}
                             <Marker {latLng} width={40} height={40}>
                                 <svg
@@ -712,16 +706,16 @@
                                 </svg>
                             </Marker>
                         {/each}
-{/if}
+                    {/if}
                 </Leaflet>
-{/if}
+            {/if}
         </div>
     </div>
 </div>
 
 {#if gameState === "policeWin"}
     <div class="game-over">
-    <h1>Thief Caught</h1>
+        <h1>Thief Caught</h1>
         <h2>The Sucker Lost</h2>
         <h3>Imagine Losing</h3>
     </div>
@@ -729,7 +723,7 @@
 
 {#if gameState === "KimJongUn"}
     <div class="game-over">
-    <h1>R.I.P thief 🪦💀</h1>
+        <h1>R.I.P thief 🪦💀</h1>
         <h2>Executed in North Korea for a robbery against the state</h2>
         <h3>Kim Jong Un seized all assets and refuses to return stolen money 🗿🗿⚔️⚔️⚔️</h3>
     </div>
@@ -737,7 +731,7 @@
 
 {#if gameState === "thiefWin"}
     <div class="game-over">
-    <h1>Interpol Lost</h1>
+        <h1>Interpol Lost</h1>
         <h2>Boss and the thief are now both richer than all of your salaries combined</h2>
         <h3>Imagine Losing! Haha!</h3>
     </div>
@@ -759,3 +753,4 @@
         Transfer Device to Thief.<br>click or tap to dismiss
     </div>
 {/if}
+
