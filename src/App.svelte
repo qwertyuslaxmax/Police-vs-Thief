@@ -269,7 +269,6 @@
             if (currentPoliceIndex == 1){
                 police2.location = policeInputProper;
                 gameState = "thiefMove"
-                maskScreen = true;
                 return;
             }
 
@@ -377,6 +376,7 @@
             {:else if gameState === "thiefMove"}
                 <div class="input-section">
                     <h2>Your Move</h2>
+                    
                     <div class="input-group">
                         <select id="country-dropdown" bind:value={thiefSelectedCountry}>
                             {#if failedRobbery}
@@ -759,7 +759,6 @@
         Transfer Device to Thief.<br>click or tap to dismiss
     </div>
 {/if}
-
 {#if gameState === "thiefSelection" || gameState === "policeSelection"}
     <div class="multiplayer-popup">
         <div class="popup-content">

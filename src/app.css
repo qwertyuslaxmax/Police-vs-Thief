@@ -342,6 +342,18 @@ h3 {
     background: #f0f0f0;
 }    
 
+
+.multiplayer-popup {
+    position: fixed;
+    bottom: 0;
+    left: calc(300px + 20px + 20.4%); /* 300px (left panel) + 20px (gap) + half of remaining space */
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    z-index: 1000;
+    animation: slideUp 0.5s ease-out;
+}
+
 .popup-content {
     background: white;
     padding: 20px;
