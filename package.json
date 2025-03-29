@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "leaflet": "^1.9.4",
+    "lucide-svelte": "^0.485.0",
     "svelte-maplibre": "^1.0.0"
   }
 }

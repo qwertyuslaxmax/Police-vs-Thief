@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy, getContext, setContext } from 'svelte';
 	import L from 'leaflet';
+
+	export let width: number;
+	export let height: number;
 	export let latLng: L.LatLngExpression;
 
 	let marker: L.Marker | undefined;
@@ -16,7 +19,12 @@
 
 	onMount(() => {
 		if (map) {
-			marker = L.marker(latLng).addTo(map);
+			let icon = L.divIcon({
+				html: markerElement,
+				className: 'map-marker',
+				iconSize: L.point(width, height)
+			});
+			marker = L.marker(latLng, { icon }).addTo(map);
 		}
 	});
 
