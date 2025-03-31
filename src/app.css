@@ -138,12 +138,25 @@ button:disabled {
     background: black;
     color: white;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     font-size: 24px;
     text-align: center;
     z-index: 1000;
     cursor: pointer;
+}
+
+.mask-screen a {
+    display: block;
+    margin-top: 20px;
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.mask-screen a:hover {
+    text-decoration: underline;
 }
 
 h2 {
@@ -350,7 +363,7 @@ h3 {
     transform: translateX(-50%);
     width: 90%;
     max-width: 500px;
-    z-index: 1000;
+    z-index: 100;
     animation: slideUp 0.5s ease-out;
 }
 

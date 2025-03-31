@@ -318,6 +318,12 @@
         gameState = "thiefMove"
     }
 
+    let hssp = false;
+
+    function hsspF(){
+        hssp = true;
+    }
+
 </script>
 
 <div class="game-container">
@@ -326,6 +332,12 @@
         <div class="panel-content">
             <h2>Game Information</h2>
             
+            {#if gameState === "thiefSelection"}
+                <div class="hssp-buttonA">
+                    <button class="hssp-buttonB" on:click={hsspF}>If from HSSP, click here</button>
+                </div>
+            {/if}
+
             {#if gameState === "thiefMove"}
                 <div class="info-section">
                     <h3>Your Location</h3>
@@ -759,6 +771,26 @@
         Transfer Device to Thief.<br>click or tap to dismiss
     </div>
 {/if}
+
+{#if hssp == true}
+    <div 
+        class="mask-screen"
+        role="button" 
+        tabindex="0"
+        on:click={removeMask} 
+        on:keydown={(e) => (e.key === "Enter" || e.key === " ") && removeMask()}
+    >
+        Hello. I am just trying to prove that this project was made by Tarik Sahin<br>
+        Refresh the page if you want to actually play the game or look at it.<br>
+        Also, don't think this is overkill. It didn't take much time since I could reuse parts.<br>
+        I know this isn't grades, certifications, or scores, but those things cost money and convenience.<br>
+        I was able to learn to code from home using the online tools I mentioned earlier without paying for certificates.<br>
+        If what you need is proof that I meet the prerequisites, then I think this should be sufficient.<br>
+        Here is the link to the code, more instructions in the email:<br>
+        <a href="https://github.com/qwertyuslaxmax/Police-vs-Thief/blob/main/src/App.svelte" target="_blank" rel="noopener noreferrer">click me</a>
+    </div>
+{/if}
+
 {#if gameState === "thiefSelection" || gameState === "policeSelection"}
     <div class="multiplayer-popup">
         <div class="popup-content">
