@@ -12,7 +12,9 @@
     let gameState = "thiefSelection"; //Determines whose move it is
     let thiefDisplay = ""; //What is displayed to the police officers
     let errorMessage = ""; //Universal usage error message
+    let notification = "";
     let turnNumber = 0; //Keeps track of # of turns (used for thiefDisplay)
+    let varB = 0.5;
 
     let prepare = 0; //Variable that represents readiness for robbery
     let cash = 150; //Used for moving as well as end goal (tbi)
@@ -27,6 +29,7 @@
     class Police {
         name: string;
         location: string;
+        previous: string;
         turnNumber: number;
         
         constructor(name: string, location: string, turnNumber: number) {
@@ -51,7 +54,16 @@
         [0, 0]
     ]
 
+    let policePreviousMarkers: Array<LatLngExpression> = [
+        [0, 0],
+        [0, 0]
+    ]
+
     let policeThiefPreviousMarker: Array<LatLngExpression> = [
+        [0, 0]
+    ]
+
+    let dummyMarker: Array<LatLngExpression> = [
         [0, 0]
     ]
 
@@ -60,6 +72,14 @@
             thiefCountryMarker[0] = [coords[thiefCountry][0], coords[thiefCountry][1]];
         } else {
             thiefCountryMarker[0] = [0, 0];
+        }
+    }
+
+    $: {
+        if (dummyCountry && coords[dummyCountry]) {
+            dummyMarker[0] = [coords[dummyCountry][0], coords[dummyCountry][1]];
+        } else {
+            dummyMarker[0] = [0, 0];
         }
     }
 
@@ -78,6 +98,16 @@
         } else {
             policeMarkers[0] = [0, 0];
             policeMarkers[1] = [0, 0];
+        }
+    }
+
+    $: {
+        if (police1.previous && coords[police1.previous] && police2.previous && coords[police2.previous]) {
+            policePreviousMarkers[0] = [coords[police1.previous][0], coords[police1.previous][1]];
+            policePreviousMarkers[1] = [coords[police2.previous][0], coords[police2.previous][1]];
+        } else {
+            policePreviousMarkers[0] = [0, 0];
+            policePreviousMarkers[1] = [0, 0];
         }
     }
 
@@ -167,9 +197,25 @@
     function thiefHandleSubmitDropdown() {
 
         turnNumber += 1;
+        varB = Math.random();
         thiefPrevious = thiefCountry;
+        if (dummyCooldown > 0) {
+            dummyCooldown -= 1;
+        }
+
+        if(dummyReset > 0) {
+            dummyReset = dummyReset - 1;
+        }
+
+        if(dummyReset == 0) {
+            dummyDisplay = dummyCountry;
+            dummyDisplayConditional = true;
+        } else {
+            dummyDisplay = "";
+            dummyDisplayConditional = false;
+        }
         
-        if(thiefSelectedCountry == "skip"){
+        if(thiefSelectedCountry == "skip") {
             thiefDisplay = thiefCountry;
             gameState = "policeMove1";
             if(numberA == 1){
@@ -219,17 +265,13 @@
             return;
         }
 
-        gameState = "policeMove1"; // Next step after thief's move
-
-        console.log('thiefCountry:', thiefCountry);
-        console.log('coords[thiefCountry]:', coords[thiefCountry]);
-        console.log(coords["New Zealand"]);  // Test with a known key
+        gameState = "policeMove1";
     }
 
     let maskScreen = false;
 
     function removeMask() {
-        maskScreen = false;  // Remove black screen when clicked
+        maskScreen = false;
     }
 
     let policeInput = "";
@@ -264,10 +306,12 @@
 
             if (currentPoliceIndex == 0){
                 police1.location = policeInputProper;
+                police1.previous = police1.location;
             }
 
             if (currentPoliceIndex == 1){
                 police2.location = policeInputProper;
+                police2.previous = police1.location;
                 gameState = "thiefMove"
                 return;
             }
@@ -281,9 +325,9 @@
         }
     }
 
-    let varB = false;
-
     function police1handleSubmit(){
+
+        police1.previous = police1.location;
         police1.location = police1selectedCountry;
 
         if (thiefCountry == police1.location || thiefCountry == police2.location){
@@ -291,16 +335,12 @@
             return;
         }
 
-        if (robbedCountries.includes(police1.location) || robbedCountries.includes(police2.location)) {
-            varB = true;
-        } else {
-            varB = false;
-        }
-
         gameState = "policeMove2"
     }
 
     function police2handleSubmit(){
+
+        police2.previous = police2.location;
         police2.location = police2selectedCountry;
 
         if (thiefCountry == police1.location || thiefCountry == police2.location){
@@ -308,20 +348,59 @@
             return;
         }
 
-        if (robbedCountries.includes(police1.location) || robbedCountries.includes(police2.location)) {
-            varB = true;
-        } else {
-            varB = false;
+        if(dummyDisplayConditional == true) {
+            dummyDisplayConditional = false;
+            dummyCountry = "";
+            dummyReset = -1;
+            dummyInput = "";
+            dummyDisplay = "";
         }
 
         maskScreen = true;
         gameState = "thiefMove"
     }
 
-    let hssp = false;
+    let dummyCooldown = 5;
+    let dummyPopup = false;
+    let dummyInput = "";
+    let dummyCountry = "";
+    let dummyReset = -1;
+    let dummyDisplayConditional = false;
+    let dummyDisplay = "";
 
-    function hsspF(){
-        hssp = true;
+    function dummyOpenPopup() {
+        if(dummyCooldown > 0) {
+            errorMessage = "Cooldown Active. Wait for " + dummyCooldown + " more turns.";
+            setTimeout(() => (errorMessage = ""), 3000);
+            return;
+        }
+        dummyPopup = true;
+    }
+
+    function dummyHandleSubmitInput() {
+        let dummyInputLowercase = toProperCase(dummyInput);
+
+        if(dummyInputLowercase in borders){
+            dummyCountry = dummyInputLowercase;
+            notification = "Dummy Successfully Placed in " + dummyCountry + ".";
+            setTimeout(() => notification = "", 3000)
+        } else {
+            errorMessage = "Invalid country! Please enter a valid country.";
+            setTimeout(() => errorMessage = "", 3000);
+        }
+
+        if(dummyCountry in borders) {
+
+            switch(turnNumber%3) {
+                case 2: dummyReset = 1;
+                case 0: dummyReset = 3;
+                case 1: dummyReset = 2;
+            }
+
+            dummyCooldown = 10;
+        }
+
+        dummyPopup = false;
     }
 
 </script>
@@ -330,15 +409,16 @@
     <!-- Left Panel - Game Information -->
     <div class="panel info-panel">
         <div class="panel-content">
-            <h2>Game Information</h2>
-            
             {#if gameState === "thiefSelection"}
-                <div class="hssp-buttonA">
-                    <button class="hssp-buttonB" on:click={hsspF}>If from HSSP, click here</button>
-                </div>
-            {/if}
-
-            {#if gameState === "thiefMove"}
+                <h2>Update Log</h2>
+                <h6 style="font-size: 0.2rem;">{trustTheProcess}</h6>
+                <ul>
+                    <li class="update">March 2025 - V-1.00<br>Basic Game Logic<br>{trustTheProcess}</li>
+                    <li class="update">March 2025 - V-1.10<br>Visual Update<br>{trustTheProcess}</li>
+                    <li class="update">April 2025 - V-1.20<br>Depth Update 1<br>{trustTheProcess}</li>
+                </ul>
+            {:else if gameState === "thiefMove"}
+                <h2>Game Information</h2>
                 <div class="info-section">
                     <h3>Your Location</h3>
                     <p class="location">{thiefCountry}</p>
@@ -356,15 +436,31 @@
                     <p class="location">{bossHome}</p>
                 </div>
             {:else if gameState === "policeMove1" || gameState === "policeMove2"}
+                <h2>Game Information</h2>
                 <div class="info-section">
                     <h3>Police Locations</h3>
                     <p class="location">Police 1: {police1.location}</p>
                     <p class="location">Police 2: {police2.location}</p>
                 </div>
-                <div class="info-section">
-                    <h3>Thief's Last Location</h3>
-                    <p class="location">{thiefDisplay}</p>
-                </div>
+                {#if varB >= 0.5}
+                    <div class="info-section">
+                        <h3>Thief's Last Location</h3>
+                        <p class="location">{thiefDisplay}</p>
+                        {#if dummyDisplayConditional}
+                            <h3>Thief's Last Location</h3>
+                            <p class="location">{dummyDisplay}</p>
+                        {/if}
+                    </div>
+                {:else}
+                    <div class="info-section">
+                        {#if dummyDisplayConditional}
+                            <h3>Thief's Last Location</h3>
+                            <p class="location">{dummyDisplay}</p>
+                        {/if}
+                        <h3>Thief's Last Location</h3>
+                        <p class="location">{thiefDisplay}</p>
+                    </div>
+                {/if}
             {/if}
         </div>
     </div>
@@ -423,18 +519,24 @@
                         </div>
                     </div>
                     <div class="police-locations">
-                        <h3>Police Locations</h3>
+                        <h3>Police Last Locations</h3>
                         <div class="location-grid">
                             <div class="location-item">
                                 <span class="location-label">Police 1:</span>
-                                <span class="location-value">{police1.location}</span>
+                                <span class="location-value">{police1.previous}</span>
                             </div>
                             <div class="location-item">
                                 <span class="location-label">Police 2:</span>
-                                <span class="location-value">{police2.location}</span>
+                                <span class="location-value">{police2.previous}</span>
                             </div>
                         </div>
                     </div>
+                    <button 
+                        class="dummy-button" 
+                        on:click={dummyOpenPopup}
+                    >
+                        Place Dummy
+                    </button>
                     {#if turnNumber > 0}
                         <div class="map-reminder">
                             Remember to reset the map view if needed!
@@ -483,8 +585,16 @@
 
             {#if errorMessage || negativePrepareError || alreadyRobbedError}
                 <div class="notification-container">
-                    <div class="notification">
+                    <div class="notification-red">
                         {errorMessage || negativePrepareError || alreadyRobbedError}
+                    </div>
+                </div>
+            {/if}
+
+            {#if notification}
+                <div class="notification-container">
+                    <div class="notification-green">
+                        {notification}
                     </div>
                 </div>
             {/if}
@@ -500,7 +610,7 @@
                     <div class="instructions">
                         {#if gameState === "thiefSelection" || gameState === "thiefMove"}
                             <p>Welcome to the Bordering Countries Game! As the thief, here's how to play:</p>
-                            <ol>
+                            <ul>
                                 <li>You are trying to rob countries and escape to your boss's home.</li>
                                 
                                 <li>Two police officers are chasing you. If they catch you, you lose!</li>
@@ -557,10 +667,10 @@
                                     </tbody>
                                 </table>
                                 <h3>{trustTheProcess}</h3>
-                            </ol>
+                            </ul>
                         {:else if gameState === "policeSelection" || gameState === "policeMove1" || gameState === "policeMove2"}
                             <p>Welcome to the Bordering Countries Game! As the police, here's how to play:</p>
-                            <ol>
+                            <ul>
                                 <li>You are two police officers trying to catch a thief.</li>
                                 <li>You can only move to countries that border your current location.</li>
                                 <li>Every 3 turns, you'll see the thief's location.</li>
@@ -587,7 +697,8 @@
                                 <li>To win, reach your boss's home with at least $800.</li>
 
                                 <h3>{trustTheProcess}</h3>
-
+                            </ul>
+                            <ol>
                                 <h2>Details:</h2>
                                 <li>Prepare is reset to -5 after any attempted robbery, serving as a robbery cooldown</li>
                                 <li>When prepare is less than 0, a robbery can't be attempted</li>
@@ -662,7 +773,7 @@
                                 </svg>
                             </Marker>
                         {/each}               
-                        {#each policeMarkers as latLng}
+                        {#each policePreviousMarkers as latLng}
                             <Marker {latLng} width={40} height={40}>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -708,6 +819,39 @@
                                     </svg>
                                 </Marker>
                             {/each}
+                        {/if}
+                        {#if dummyDisplayConditional}
+                            {#if dummyCountry in borders}
+                                {#each dummyMarker as latLng}
+                                    <Marker {latLng} width={40} height={40}>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            xml:space="preserve"
+                                            style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2"
+                                            viewBox="0 0 60.601004 60.601004"
+                                        >
+                                        <path style="fill:#010002;" d="M33.47,36.538c0.102-0.43,0.172-0.885,0.193-1.372c0.404-8.843-4.428-16.084-11.671-20.739
+                                            c-4.308-2.77-8.394,0.25-9.432,4.101c-2.67-2.125-7.294,1.055-5.214,4.548c0.076,0.127,0.154,0.255,0.232,0.383
+                                            c-2.088-0.008-8.742-0.029-6.879,0.002c2.202,0.038,7.486,5.964,7.486,5.964v-5c1.623,2.482,3.698,4.804,6.786,5.155
+                                            c1.408,0.161,2.571-0.275,3.527-1.038c1.207,1.477,1.822,3.135,1.942,5.125c-1.057-0.016-2.117,0.027-3.187,0.152
+                                            c-3.691,0.435-5.969,1.248-6.715,5.109c-1.122,5.824,1.907,10.078,5.174,14.53c2.658,3.621,8.776,0.112,6.083-3.56
+                                            c-2.202-3-4.417-5.465-4.326-8.951c2.152-0.327,4.292-0.239,6.477-0.03c1.069,0.46,2.275,0.646,3.469,0.553
+                                            c1.781,5.955,5.163,11.259,9.543,15.783c3.166,3.271,8.143-1.722,4.982-4.979C37.597,47.782,34.688,42.585,33.47,36.538z"/>
+                                        <path style="fill:#010002;" d="M6.805,7.951c0.009,0.1,0.012,0.2,0.026,0.301c0.449,3.26,3.454,5.539,6.712,5.09
+                                            c3.26-0.448,5.536-3.452,5.09-6.712c-0.092-0.678-0.3-1.309-0.594-1.885c0.201-0.097,0.292-0.328,0.224-0.809l-0.194-1.423
+                                            c-0.22-1.591-1.687-2.705-3.276-2.485l-6.342,0.87c-1.595,0.22-2.706,1.687-2.487,3.28l0.155,1.151
+                                            C5.23,6.038,4.479,6.934,4.642,7.884C4.784,8.727,5.718,8.518,6.805,7.951z"/>
+                                        <path style="fill:#010002;" d="M22.894,13.399c0,0,14.28,7.656,12.593,18.94c-3.698,9.408,12.449,19.098,21.229-2.6
+                                            C56.715,29.739,67.895,0.001,22.894,13.399z M47.071,31.105v1.814h-1.93v-1.707c-0.894-0.084-1.783-0.379-2.358-0.787
+                                            l-0.271-0.195l0.7-1.958l0.47,0.313c0.609,0.407,1.396,0.642,2.15,0.642c0.923,0,1.539-0.479,1.539-1.19
+                                            c0-0.48-0.191-1.001-1.604-1.573c-1.492-0.584-3.021-1.435-3.021-3.287c0-1.489,0.979-2.65,2.514-3.037v-1.763h1.913v1.643
+                                            c0.731,0.074,1.37,0.277,1.945,0.614l0.321,0.19l-0.73,1.928l-0.45-0.256c-0.264-0.151-0.887-0.508-1.876-0.508
+                                            c-0.975,0-1.322,0.512-1.322,0.991c0,0.519,0.258,0.855,1.791,1.491c1.326,0.54,2.853,1.422,2.853,3.451
+                                            C49.702,29.458,48.659,30.7,47.071,31.105z"/>
+                                        </svg>
+                                    </Marker>
+                                {/each}
+                            {/if}
                         {/if}
                         {#each policeMarkers as latLng}
                             <Marker {latLng} width={40} height={40}>
@@ -755,11 +899,6 @@
     </div>
 {/if}
 
-{#if varB}
-    <p>This country was robbed</p>
-    <p>Thief Cash: ${cash}</p>
-{/if}
-
 {#if maskScreen}
     <div 
         class="mask-screen"
@@ -772,36 +911,38 @@
     </div>
 {/if}
 
-{#if hssp == true}
-    <div 
-        class="mask-screen"
-        role="button" 
-        tabindex="0"
-        on:click={removeMask} 
-        on:keydown={(e) => (e.key === "Enter" || e.key === " ") && removeMask()}
-    >
-        Hello. I am just trying to prove that this project was made by Tarik Sahin<br>
-        Refresh the page if you want to actually play the game or look at it.<br>
-        Also, don't think this is overkill. It didn't take much time since I could reuse parts.<br>
-        I know this isn't grades, certifications, or scores, but those things cost money and convenience.<br>
-        I was able to learn to code from home using the online tools I mentioned earlier without paying for certificates.<br>
-        If what you need is proof that I meet the prerequisites, then I think this should be sufficient.<br>
-        Here is the link to the code, more instructions in the email:<br>
-        <a href="https://github.com/qwertyuslaxmax/Police-vs-Thief/blob/main/src/App.svelte" target="_blank" rel="noopener noreferrer">click me</a>
-    </div>
-{/if}
-
 {#if gameState === "thiefSelection" || gameState === "policeSelection"}
     <div class="multiplayer-popup">
         <div class="popup-content">
             <h3>🎮 Local Multiplayer Hotseat Game</h3>
             <p>This is a local multiplayer game where players take turns on the same device:</p>
-            <ol>
+            <ul>
                 <li>Player 1: You are the thief trying to rob countries and escape</li>
                 <li>Player 2: You control two police officers trying to catch the thief</li>
                 <li>After each player's turn, pass the device to the other player</li>
                 <li>The game continues until either the thief is caught or escapes</li>
-            </ol>
+            </ul>
         </div>
     </div>
+{/if}
+
+{#if dummyPopup}
+  <div id="popup-overlay">
+    <div class="popup">
+        <button class="close-button" on:click={() => dummyPopup = false}>×</button>
+        
+        <h2>Instructions</h2>
+        <p>Please select an option before submitting.</p>
+        
+        <div class="input-group">
+            <input 
+                id="text-input" 
+                type="text" 
+                bind:value={dummyInput}
+                placeholder="Enter country name..."
+            />
+            <button on:click={dummyHandleSubmitInput}>Place Dummy</button>
+        </div>
+    </div>
+  </div>
 {/if}
