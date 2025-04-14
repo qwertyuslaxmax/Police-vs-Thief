@@ -17,13 +17,14 @@
     let varB = 0.5;
 
     let prepare = 0; //Variable that represents readiness for robbery
-    let cash = 150; //Used for moving as well as end goal (tbi)
+    let cash = 200; //Used for moving as well as end goal (tbi)
     let trustTheProcess = "‎"; //trust me
     let thiefInput = ""; //used for storing thief's input
     let failedRobbery = false; //Feature to display error message and also used for detaining
     let thiefCountry = ""; //Self Explanatory
     let thiefSelectedCountry = ""; //Temp Variable used as middleman between html and js
     let thiefPrevious = ""; //Self Explanatory
+    let whoseTurnNext = "";
     $: thiefBorderingCountries = thiefCountry ? [thiefCountry, ...getBorderingCountries(thiefCountry)] : [];
 
     class Police {
@@ -175,7 +176,7 @@
         }
 
         if (rob()) {
-            cash += 150;
+            cash += 200;
             robbedCountries = [...robbedCountries, thiefCountry];
             failedRobbery = false;
         } else {
@@ -185,7 +186,7 @@
             }
         }
 
-        prepare = -5;
+        prepare = -4;
 
         if (varA == false) {
             gameState = "KimJongUn";
@@ -234,7 +235,7 @@
 
         if (thiefPrevious !== thiefCountry) {
             if (cash >= 10) {
-                cash -= 10;
+                cash -= 20;
             } else {
                 errorMessage = "Not enough cash to move!";
                 setTimeout(() => (errorMessage = ""), 3000);
@@ -262,18 +263,13 @@
             return;
         }
 
-        if (thiefCountry == bossHome && cash >= 800){
+        if (thiefCountry == bossHome && cash >= 1000){
             gameState = "thiefWin";
             return;
         }
 
-        gameState = "policeMove1";
-    }
-
-    let maskScreen = false;
-
-    function removeMask() {
-        maskScreen = false;
+        whoseTurnNext = "Police"
+        gameState = "mask-screen";
     }
 
     let policeInput = "";
@@ -314,7 +310,8 @@
             if (currentPoliceIndex == 1){
                 police2.location = policeInputProper;
                 police2.previous = police1.location;
-                gameState = "thiefMove"
+                whoseTurnNext = "Thief"
+                gameState = "mask-screen"
                 return;
             }
 
@@ -358,8 +355,8 @@
             dummyDisplay = "";
         }
 
-        maskScreen = true;
-        gameState = "thiefMove"
+        whoseTurnNext = "Thief";
+        gameState = "mask-screen";
     }
 
     let dummyCooldown = 5;
@@ -377,6 +374,12 @@
             return;
         }
         dummyPopup = true;
+    }
+
+    let seaPaths = false;
+
+    function viewList() {
+        seaPaths = true;
     }
 
     function dummyHandleSubmitInput() {
@@ -405,9 +408,19 @@
         gameState = "hssp";
     }
 
+    function nextTurn() {
+        switch(whoseTurnNext.toLowerCase()) {
+            case "thief":
+                gameState = "thiefMove";
+                break;
+            case "police":
+                gameState = "policeMove1";
+                break;
+        }
+    }
 </script>
 
-{#if gameState !== "hssp"}
+{#if gameState !== "hssp" && gameState !== "mask-screen"}
     <div class="game-container">
         <!-- Left Panel - Game Information -->
         <div class="panel info-panel">
@@ -536,11 +549,19 @@
                                 </div>
                             </div>
                         </div>
+                        <h3>{trustTheProcess}</h3>
                         <button 
                             class="dummy-button" 
                             on:click={dummyOpenPopup}
                         >
                             Place Dummy
+                        </button>
+                        <h6>{trustTheProcess}</h6>
+                        <button 
+                            class="dummy-button" 
+                            on:click={viewList}
+                        >
+                            Sea path reference sheet
                         </button>
                         {#if turnNumber > 0}
                             <div class="map-reminder">
@@ -616,30 +637,33 @@
                             {#if gameState === "thiefSelection" || gameState === "thiefMove"}
                                 <p>Welcome to the Bordering Countries Game! As the thief, here's how to play:</p>
                                 <ul>
-                                    <li>You are trying to rob countries and escape to your boss's home.</li>
-                                    
-                                    <li>Two police officers are chasing you. If they catch you, you lose!</li>
-                                    <li>They can see your last location when turn number is divisible by 3</li>
-                                    <li>Note that the if your turn number is x, their next turn number will be x+1</li>
-
-                                    <li>Each move costs $10, and you start with $150.</li>
-                                    <li>You can rob countries for $150, but be careful - there's a chance of failure!</li>
-                                    <li>If you fail to rob a country, you are detained for 2 turns in that country, and the police can see your location for the whole time</li>
-                                    <li>If you successfully rob a country, you can move to any bordering country</li>
-                                    <li>To win, reach your boss's home with at least $800</li>
-
-                                    <li>There are 2 factors that determine if you rob a country successfully:</li>
-                                    <li>1. Your prepare value, which increases by 1 when you stay in the same country and choose not to move</li>
-                                    <li>2. Boss locations, which will be listed shortly, are easier to rob because your boss has provided instructions on how to rob those places</li>
-
-                                    <li>To win, reach your boss's home with at least $800.</li>
-
-                                    <h3>{trustTheProcess}</h3>
-
-                                    <h2>Details:</h2>
-                                    <li>Prepare is reset to -5 after any attempted robbery, serving as a robbery cooldown</li>
-                                    <li>When prepare is less than 0, a robbery can't be attempted</li>
-                                    <li>Success rates for robberies:</li>
+                                    <li>Your objective is to make at least 1000$ and return that money to your boss.</li>
+                                    <li>{trustTheProcess}</li>
+                                    <li>At the core of the game is a police chase. The two police officers try to catch you, while you try to make enough money to win.</li>
+                                    <li>Movement is done through bordering countries, which include most acceptable land borders and some sea paths used to enhance the game.</li>
+                                    <li>A list of all sea paths can be accessed in game using a clearly labeled button.</li>
+                                    <li>For you, each move costs 20$, so a constant chase won't benefit you all that much.</li>
+                                    <li>Both sides can see the other's last location from 2 turns ago, or in other words, the location that the person was at, and moved away from.</li>
+                                    <li>If you take the following path: Croatia, Serbia, Bulgaria, Turkey</li>
+                                    <li>Your opponent will see Bulgaria when you are really at Turkey.</li>
+                                    <li>The thief will always be able to get this "last" location. However, the police only get it every 3 turns, or everytime their turn number is divisible by three.</li>
+                                    <li>It is important to note that as the thief, if you see that turn number is some integer x, the police's turn number next turn will be x + 1</li>
+                                    <li>So, the police is a step ahead in terms of turn number, although that does not mean much other than for calculations.</li>
+                                    <li>As the game continues to develop, more and more features will be added. Currently, the thief has the ability to place a decoy dummy in a country of his/her choice.</li>
+                                    <li>This means that the police will see that location, and your actual previous (or last) location at the same time.</li>
+                                    <li>Note that this ability has a 10 move cooldown and should probably be saved for emergencies (but you should develop your own tactics).</li>
+                                    <li>That explains the chase, next is the the thief's win condition.</li>
+                                    <li>{trustTheProcess}</li>
+                                    <li>You make money by robbing countries. Note that you may not successfully rob a country more than once.</li>
+                                    <li>However, robberies do come at a cost.</li>
+                                    <li>There is always a chance of a robbery failing, which leads to a 2 turn ban on movement. During these two moves, your location will always be broadcasted to the police officers.</li>
+                                    <li>You are able to lower that chance through increasing your preparation. Your prepaparation increases by one everytime you stay in a country for more than one turn.</li>
+                                    <li>Note that when you attempt a robbery, your preparation resets to -4, acting as a robbery cooldown.</li>
+                                    <li>When preaparation is less than zero, your preparation will increase by one every turn regardless of whether you stay or not.</li>
+                                    <li>The second factor that determines a robbery's chance of success is whether the country is in boss locations or not.</li>
+                                    <li>Boss Locations are 10 randomly generated nations that are easier to rob since your boss has already provided you with instructions on how to rob them.</li>
+                                    <li>Robbing these countries decreases the amount you need to prepare. See the chart below for details.</li>
+                                    <li>{trustTheProcess}</li>
                                     <table class="success-table">
                                         <thead>
                                             <tr>
@@ -672,42 +696,35 @@
                                         </tbody>
                                     </table>
                                     <h3>{trustTheProcess}</h3>
+                                    <li>Once you've accumulated over 1000$, you can go to your boss's home country to win.</li>
+                                    <li>If you are ever caught by the police (beware, objects on map are closer than they appear), you lose.</li>
+                                    <li>The next update will likely change this last mechanic but for now, this is the way.</li>
                                 </ul>
                             {:else if gameState === "policeSelection" || gameState === "policeMove1" || gameState === "policeMove2"}
                                 <p>Welcome to the Bordering Countries Game! As the police, here's how to play:</p>
-                                <ul>
-                                    <li>You are two police officers trying to catch a thief.</li>
-                                    <li>You can only move to countries that border your current location.</li>
-                                    <li>Every 3 turns, you'll see the thief's location.</li>
-                                    <li>If either of you catches the thief, you win!</li>
-                                    <li>If the thief reaches their boss's home with $800, you lose.</li>
-                                    <li>Work together to corner and catch the thief!</li>
-                                    <h3>{trustTheProcess}</h3>
-                                    <li>Thief Instructions with more information:</li>
-
-                                    <li>Two police officers are chasing you. If they catch you, you lose!</li>
-                                    <li>They can see your last location when turn number is divisible by 3</li>
-                                    <li>Note that the if your turn number is x, their next turn number will be x+1</li>
-
-                                    <li>Each move costs $10, and you start with $150.</li>
-                                    <li>You can rob countries for $150, but be careful - there's a chance of failure!</li>
-                                    <li>If you fail to rob a country, you are detained for 2 turns in that country, and the police can see your location for the whole time</li>
-                                    <li>If you successfully rob a country, you can move to any bordering country</li>
-                                    <li>To win, reach your boss's home with at least $800</li>
-
-                                    <li>There are 2 factors that determine if you rob a country successfully:</li>
-                                    <li>1. Your prepare value, which increases by 1 when you stay in the same country and choose not to move</li>
-                                    <li>2. Boss locations, which will be listed shortly, are easier to rob because your boss has provided instructions on how to rob those places</li>
-
-                                    <li>To win, reach your boss's home with at least $800.</li>
-
-                                    <h3>{trustTheProcess}</h3>
-                                </ul>
-                                <ol>
-                                    <h2>Details:</h2>
-                                    <li>Prepare is reset to -5 after any attempted robbery, serving as a robbery cooldown</li>
-                                    <li>When prepare is less than 0, a robbery can't be attempted</li>
-                                    <li>Success rates for robberies:</li>
+                                    <li>The thief's objective is to make at least 1000$ and return that money to his boss, and your's is to catch him before that happens.</li>
+                                    <li>{trustTheProcess}</li>
+                                    <li>At the core of the game is a police chase. The two police officers try to catch the thief, while the thief tries to make money.</li>
+                                    <li>Movement is done through bordering countries, which include most acceptable land borders and some sea paths used to enhance the game.</li>
+                                    <li>A list of all sea paths can be accessed in game using a clearly labeled button.</li>
+                                    <li>Both sides can see the other's last location from 2 turns ago, or in other words, the location that the person was at, and moved away from.</li>
+                                    <li>If you take the following path: Croatia, Serbia, Bulgaria, Turkey</li>
+                                    <li>Your opponent will see Bulgaria when you are really at Turkey.</li>
+                                    <li>The thief will always be able to get this "last" or "previous" location. However, you only get it every 3 turns, or everytime your turn number is divisible by three.</li>
+                                    <li>Remember to check to see if you have the thief's location, as you might see it if the thief fails a robbery and is detained.</li>
+                                    <li>Every 10 moves, the thief is able to place a decoy dummy to trick you. You will still see the actual location, however there will also be a second one.</li>
+                                    <li>That explains the chase, next is the the thief's win condition explained from his perspective.</li>
+                                    <li>{trustTheProcess}</li>
+                                    <li>You make money by robbing countries. Note that you may not successfully rob a country more than once.</li>
+                                    <li>However, robberies do come at a cost.</li>
+                                    <li>There is always a chance of a robbery failing, which leads to a 2 turn ban on movement. During these two moves, your location will always be broadcasted to the police officers.</li>
+                                    <li>You are able to lower that chance through increasing your preparation. Your prepaparation increases by one everytime you stay in a country for more than one turn.</li>
+                                    <li>Note that when you attempt a robbery, your preparation resets to -4, acting as a robbery cooldown.</li>
+                                    <li>When preaparation is less than zero, your preparation will increase by one every turn regardless of whether you stay or not.</li>
+                                    <li>The second factor that determines a robbery's chance of success is whether the country is in boss locations or not.</li>
+                                    <li>Boss Locations are 10 randomly generated nations that are easier to rob since your boss has already provided you with instructions on how to rob them.</li>
+                                    <li>Robbing these countries decreases the amount you need to prepare. See the chart below for details.</li>
+                                    <li>{trustTheProcess}</li>
                                     <table class="success-table">
                                         <thead>
                                             <tr>
@@ -740,9 +757,14 @@
                                         </tbody>
                                     </table>
                                     <h3>{trustTheProcess}</h3>
-                                </ol>
+                                    <li>Once you've accumulated over 1000$, you can go to your boss's home country to win.</li>
+                                    <li>If you are ever caught by the police (beware, objects on map are closer than they appear), you lose.</li>
+                                    <h3>{trustTheProcess}</h3>
+                                    <li>As the police, this means that the thief will likely try to stay in the same country, and you should use that to close the chase and put pressure.</li>
                             {/if}
+                            <h3>{trustTheProcess}</h3>
                             <p>Good luck!</p>
+                            <h3>{trustTheProcess}</h3>
                             <h3>{trustTheProcess}</h3>
                         </div>
                     </div>
@@ -905,18 +927,6 @@
     </div>
 {/if}
 
-{#if maskScreen}
-    <div 
-        class="mask-screen"
-        role="button" 
-        tabindex="0"
-        on:click={removeMask} 
-        on:keydown={(e) => (e.key === "Enter" || e.key === " ") && removeMask()}
-    >
-        Transfer Device to Thief.<br>click or tap to dismiss
-    </div>
-{/if}
-
 {#if gameState === "thiefSelection" || gameState === "policeSelection"}
     <div class="multiplayer-popup">
         <div class="popup-content">
@@ -934,11 +944,8 @@
 
 {#if dummyPopup}
   <div id="popup-overlay">
-    <div class="popup">
+    <div class="popupD">
         <button class="close-button" on:click={() => dummyPopup = false}>×</button>
-        
-        <h2>Instructions</h2>
-        <p>Please select an option before submitting.</p>
         
         <div class="input-group">
             <input 
@@ -953,6 +960,41 @@
   </div>
 {/if}
 
+{#if seaPaths}
+    <div id="popup-overlay">
+        <div class="popupS">
+            <button class="close-button" on:click={() => seaPaths = false}>×</button>
+
+            <h2>Sea Paths</h2>
+            <p>Antarctica - Chile</p>
+            <p>Antarctica - South Africa</p>
+            <p>Antarctica - New Zealand</p>
+            <p>New Zealand - Australia</p>
+            <p>Australia - Papua New Guinea</p>
+            <p>Indonesia - Australia</p>
+            <p>Singapore - Indonesia</p>
+            <p>Japan - South Korea</p>
+            <p>Russia - Japan</p>
+            <p>Russia - USA</p>
+            <p>USA - Cuba</p>
+            <p>Cuba - Mexico</p>
+            <p>Egypt - Saudi Arabia</p>
+            <p>UAE - Iran</p>
+            <p>Azerbaijan - Turkmenistan</p>
+
+            <h2>Not well known paths</h2>
+            <p>Canada - Denmark</p>
+            <p>France - Brazil & Suriname</p>
+            <p>France - Netherlands</p>
+            <p>Morocco - Spain</p>
+            
+            <h2>Slightly Controversial Borders</h2>
+            <p>Denmark - Sweden</p>
+            <p>Singapore - Malaysia</p>
+        </div>
+    </div>
+{/if}
+
 {#if gameState === "hssp"}
   <!-- Fullscreen non-interactive map -->
     <div class="fullscreen-map">
@@ -960,7 +1002,7 @@
     </div>
   
   <div id="popup-overlay">
-    <div class="popup">
+    <div class="popupD">
         <button class="close-button" on:click={() => gameState = "thiefSelection"}>×</button>
         
         <h2>This is just proof that this project was developed by Tarık Şahin.</h2>
@@ -970,4 +1012,18 @@
         
     </div>
   </div>
+{/if}
+
+{#if gameState === "mask-screen"}
+
+    <div class="fullscreen-map">
+        <Leaflet view={view1} zoom={2.5}></Leaflet>
+    </div>
+
+    <div id="popup-overlay">
+        <div class="popupD">
+            <h2>Transfer device to {whoseTurnNext}</h2>
+            <button class="Confirm" on:click={nextTurn}>Move on</button>
+        </div>
+    </div>
 {/if}

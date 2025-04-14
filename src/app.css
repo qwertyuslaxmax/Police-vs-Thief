@@ -461,7 +461,7 @@ h3 {
     z-index: 1000;
   }
   
-.popup {
+.popupD {
     background: white;
     padding: 2rem;
     border-radius: 12px;
@@ -471,6 +471,20 @@ h3 {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     text-align: center;
 }
+
+.popupS {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh; /* 👈 limit height to 80% of the viewport */
+    overflow-y: auto;  /* 👈 scroll vertically if content overflows */
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
   
 .close-button {
     position: absolute;
@@ -481,6 +495,10 @@ h3 {
     border: none;
     cursor: pointer;
     color: #444;
+}
+
+.close-button:hover{
+    background:#da190b
 }
   
 .input-select {
@@ -544,4 +562,12 @@ ul {
     /* filter: brightness(0.5) blur(2px); */
 }
 
+.dummy-button {
+    background:#2196F3;
+    width:auto;
+    margin-top: auto;
+}
 
+.dummy-button:hover {
+    background:#007bff;
+}
