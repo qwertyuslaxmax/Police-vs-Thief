@@ -18,7 +18,7 @@
 
 .panel-content {
     padding: 20px;
-    height: 100%;
+    max-height: 100vh; /* Or whatever height you want */
     overflow-y: auto;
 }
 
@@ -461,7 +461,7 @@ h3 {
     z-index: 1000;
   }
   
-  .popup {
+.popup {
     background: white;
     padding: 2rem;
     border-radius: 12px;
@@ -470,9 +470,9 @@ h3 {
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     text-align: center;
-  }
+}
   
-  .close-button {
+.close-button {
     position: absolute;
     top: 0.5rem;
     right: 0.75rem;
@@ -481,16 +481,16 @@ h3 {
     border: none;
     cursor: pointer;
     color: #444;
-  }
+}
   
-  .input-select {
+.input-select {
     margin: 1rem 0;
     padding: 0.5rem;
     width: 100%;
     font-size: 1rem;
-  }
+}
   
-  .submit-button {
+.submit-button {
     padding: 0.5rem 1rem;
     font-size: 1rem;
     background-color: #2e86de;
@@ -498,17 +498,50 @@ h3 {
     border: none;
     border-radius: 6px;
     cursor: pointer;
-  }
+}
   
-  .update {
+.update {
     color:#333;
     font-family: 'Raleway', sans-serif;
     font-weight: 550;
     font-size: large;
-  }
+}
 
-  ul {
+ul {
     list-style: none;
     padding-left: 0.7rem;
     margin-left: 0;
-  }
+}
+
+.panel-content::-webkit-scrollbar {
+    width: 8px;
+}
+  
+.panel-content::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.fullscreen-map {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0; /* Behind the popup */
+    pointer-events: none; /* Makes it non-interactive */
+    overflow: hidden;
+}
+
+.fullscreen-map iframe,
+.fullscreen-map > * {
+    width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: cover;
+    filter: brightness(0.5); /* Darkens the map */
+    /* Optional: add blur if you want it to look soft */
+    /* filter: brightness(0.5) blur(2px); */
+}
+
+
