@@ -69,31 +69,25 @@
         [0, 0]
     ]
 
-    $: {
+    function editMarkerLocations() {
         if (thiefCountry && coords[thiefCountry]) {
             thiefCountryMarker[0] = [coords[thiefCountry][0], coords[thiefCountry][1]];
         } else {
             thiefCountryMarker[0] = [0, 0];
         }
-    }
-
-    $: {
+    
         if (dummyCountry && coords[dummyCountry]) {
             dummyMarker[0] = [coords[dummyCountry][0], coords[dummyCountry][1]];
         } else {
             dummyMarker[0] = [0, 0];
         }
-    }
-
-    $: {
+    
         if (thiefPrevious && coords[thiefPrevious]) {
             policeThiefPreviousMarker[0] = [coords[thiefPrevious][0], coords[thiefPrevious][1]];
         } else {
             policeThiefPreviousMarker[0] = [0, 0];
         }
-    }
 
-    $: {
         if (police1.location && coords[police1.location] && police2.location && coords[police2.location]) {
             policeMarkers[0] = [coords[police1.location][0], coords[police1.location][1]];
             policeMarkers[1] = [coords[police2.location][0], coords[police2.location][1]];
@@ -101,9 +95,7 @@
             policeMarkers[0] = [0, 0];
             policeMarkers[1] = [0, 0];
         }
-    }
-
-    $: {
+    
         if (police1.previous && coords[police1.previous] && police2.previous && coords[police2.previous]) {
             policePreviousMarkers[0] = [coords[police1.previous][0], coords[police1.previous][1]];
             policePreviousMarkers[1] = [coords[police2.previous][0], coords[police2.previous][1]];
@@ -268,6 +260,7 @@
             return;
         }
 
+        editMarkerLocations();
         whoseTurnNext = "Police"
         gameState = "mask-screen";
     }
@@ -310,6 +303,7 @@
             if (currentPoliceIndex == 1){
                 police2.location = policeInputProper;
                 police2.previous = police1.location;
+                editMarkerLocations();
                 whoseTurnNext = "Thief"
                 gameState = "mask-screen"
                 return;
@@ -327,20 +321,28 @@
     function police1handleSubmit(){
 
         police1.previous = police1.location;
+        let g = police1.previous;
         police1.location = police1selectedCountry;
+        police1 = new Police("", police1.location, police1.turnNumber);
+        police1.previous = g; 
+
 
         if (thiefCountry == police1.location || thiefCountry == police2.location){
             gameState = "policeWin";
             return;
         }
 
+        editMarkerLocations();
         gameState = "policeMove2"
     }
 
     function police2handleSubmit(){
 
         police2.previous = police2.location;
+        let g = police2.previous;
         police2.location = police2selectedCountry;
+        police2 = new Police("", police2.location, police2.turnNumber);
+        police2.previous = g;
 
         if (thiefCountry == police1.location || thiefCountry == police2.location){
             gameState = "policeWin";
@@ -355,6 +357,7 @@
             dummyDisplay = "";
         }
 
+        editMarkerLocations();
         whoseTurnNext = "Thief";
         gameState = "mask-screen";
     }
@@ -425,13 +428,14 @@
         <!-- Left Panel - Game Information -->
         <div class="panel info-panel">
             <div class="panel-content">
-                {#if gameState === "thiefSelection"}
+                {#if gameState === "thiefSelection" || gameState === "policeSelection"}
                     <h2>Update Log</h2>
                     <h6 style="font-size: 0.2rem;">{trustTheProcess}</h6>
                     <ul>
                         <li class="update">March 2025 - V-1.00<br>Basic Game Logic<br>{trustTheProcess}</li>
                         <li class="update">March 2025 - V-1.10<br>Visual Update<br>{trustTheProcess}</li>
                         <li class="update">April 2025 - V-1.20<br>Depth Update 1<br>{trustTheProcess}</li>
+                        <li class="update">April 2025 - V-1.22<br>1.20 Improvements<br>{trustTheProcess}</li>
                     </ul>
                     <h4>Solo Development by Tarık Şahin</h4>
                     <button class="hssp" on:click={hssp}>HSSP Application Proof</button>
