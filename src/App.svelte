@@ -95,16 +95,11 @@
         if (blockaded.includes(thiefCountry) && blockaded.includes(thiefSelectedCountry) && thiefCountry != thiefSelectedCountry) {
             message = "This border is blockaded! Must find andother way!";
             setTimeout(() => (message = ""), 4000);
-        }
-
-        if (blockadeDuration > 0) {
-            blockadeDuration -= 1;
-        } else {
-            blockaded = ["", ""];
+            return;
         }
 
         if (failedRobbery == true && thiefCountry == "North Korea") {
-            gameState == "KimJongUn";
+            gameState = "KimJongUn";
             return;
         }
 
@@ -118,7 +113,7 @@
         policeFunding -= 200;
 
         if (policeFunding <= -500) {
-            gameState == "policeLose";
+            gameState = "policeLose";
             return;
         }
 
@@ -165,6 +160,12 @@
         }
 
         thiefCountry = thiefSelectedCountry;
+
+        if (blockadeDuration > 0) {
+            blockadeDuration -= 1;
+        } else {
+            blockaded = ["", ""];
+        }
 
         if (thiefPrevious !== thiefCountry) {
             if (cash >= 10) {
@@ -338,7 +339,7 @@
             police2.previous = g;
         }
 
-        if (thiefCountry == police2.location || thiefCountry == police2.location){
+        if (thiefCountry == police1.location || thiefCountry == police2.location){
             gameState = "policeWin";
             return;
         }
@@ -506,21 +507,26 @@
 
         blockadeAborders = blockade1 ? [blockade1, ...getBorderingCountries(blockade1)] : [];
         blockadePopupA = false;
+        blockadePopupB = true;
     }
 
     let blockaded = ["", ""];
 
     function blockadeSubmit() {
-        if (!blockadeAborders.includes(blockadeInput)) {
+        const normalized = toProperCase(blockadeInput);
+
+        if (!blockadeAborders.includes(normalized)) {
             message = "Invalid country! Please enter a valid bordering country.";
             setTimeout(() => message = "", 4000);
+            return;
         }
+
+        blockaded = [blockade1, normalized];
+
 
         policeFunding -= 1000;
         blockadeCooldown = 15;
 
-        blockaded[0] = blockade1;
-        blockaded[1] = blockadeInput;
         blockadeDuration = 3;
 
         blockadePopupB = false;
@@ -544,14 +550,14 @@
             return;
         }
         
-        blockadePopupA = true;
+        investigationPopup = true;
     }
 
     function investigateHandleSubmitInput() {
         let investigated = toProperCase(investigateInput);
 
         if(investigated in borders){
-            if (investigated in bossLocations) {
+            if (bossLocations.includes(investigated)) {
                 message = investigated + " is a boss location. Bingo!";
                 setTimeout(() => message = "", 5000)
             } else if (investigated == bossHome) {
@@ -561,12 +567,16 @@
                 message = investigated + " is not a relevant location for the boss. Clear.";
                 setTimeout(() => message = "", 4000)
             }
+            policeFunding -= 100;
+            investigationCooldown = 3;
+
         } else {
             message = "Invalid country! Please enter a valid country.";
             setTimeout(() => message = "", 4000);
         }
 
         investigationPopup = false;
+        
     }
 
     let received = false;
@@ -742,8 +752,8 @@
         <section>
             <h3>Police</h3>
             <ul>
-            <li>P1: {police1.location}</li>
-            <li>P2: {police2.location}</li>
+            <li>P1: {police1.previous}</li>
+            <li>P2: {police2.previous}</li>
             </ul>
         </section>
 
@@ -1077,7 +1087,7 @@
 
         <div id="popup-overlay">
             <div class="popup-box">
-                <button class="close-button" on:click={() => {dummyPopup = false; blockadePopupA = false; blockadePopupB = false}}>×</button>
+                <button class="close-button" on:click={() => {dummyPopup = false; blockadePopupA = false; blockadePopupB = false; investigationPopup = false}}>×</button>
                 {#if dummyPopup === true}
                     <div>
                         <h2>Type Dummy Location</h2>

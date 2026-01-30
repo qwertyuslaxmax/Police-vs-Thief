@@ -24,13 +24,22 @@
 				const code = feature.properties?.adm0_a3;
 				const isAvailable = availableCountries.includes(code);
 
-				(layer as L.Path).setStyle({
-					color: isAvailable ? '#6b9ea0' : '#b5b5b5', // border
-					fillColor: isAvailable ? '#cfe4e2' : '#eeeeee',
-					fillOpacity: isAvailable ? 0.55 : 0.25,
-					weight: isAvailable ? 1.5 : 0.8,
-					opacity: 1
-				});
+				(layer as L.Path).setStyle(
+				isAvailable
+					? {
+						color: '#6b9ea0',
+						fillColor: '#cfe4e2',
+						fillOpacity: 0.55,
+						weight: 1.5,
+						opacity: 1
+					}
+					: {
+						opacity: 0,
+						fillOpacity: 0,
+						weight: 0,
+						interactive: false
+					}
+				);
 
 				if (!isAvailable) return;
 
@@ -79,18 +88,17 @@
 		geoJsonLayer.eachLayer((layer) => {
 			const feature = (layer as any).feature;
 			const code = feature?.properties?.adm0_a3;
-			const isAvailable = availableCountries.includes(code);
+
+			if (!availableCountries.includes(code)) return;
 
 			const isSelected = tempSelectedCode === code;
 
 			(layer as L.Path).setStyle({
-				color: '#6b9ea0',
-				fillColor: isSelected ? '#66ff66' : (isAvailable ? '#cfe4e2' : '#eeeeee'),
-				fillOpacity: isSelected ? 0.7 : (isAvailable ? 0.55 : 0.25),
-				weight: isAvailable ? 1.5 : 0.8,
-				opacity: 1
+				fillColor: isSelected ? '#66ff66' : '#cfe4e2',
+				fillOpacity: isSelected ? 0.7 : 0.55
 			});
 		});
+
 	});
 
 	function highlightSelected(code: string) {
