@@ -1016,11 +1016,11 @@
         <div class="fullscreen-map"><Leaflet view={view1} zoom={2.5}></Leaflet></div>
         <div class="mask-overlay">
             <div class="mask-card">
-                {#if gameState == "thiefWin"}
+                {#if gameState == "policeWin"}
                     <p class="mask-message">Thief Caught</p>
                     <p class="mask-message">The Sucker Lost</p>
                     <p class="mask-message">Imagine Losing Hahahaha</p>
-                {:else if gameState == "policeWin"}
+                {:else if gameState == "thiefWin"}
                     <p class="mask-message">The Thief has done it!</p>
                     <p class="mask-message">{policeForce} has lost. L bozo, one thief and his boss lmaooooooo...</p>
                     <p class="mask-message">The boss and thief are both individually richer than all of the police officers' salaries combined.</p>
@@ -1129,33 +1129,6 @@
                         <button class="button-54" on:click={investigateHandleSubmitInput}>Investigate!</button>
                     </div>
                 {/if}
-            </div>
-            
-        </div>
-    </div>
-{/if}
-
-{#if blockadePopupA === true}
-    <div>
-        <div class="fullscreen-map">
-            <Leaflet view={view1} zoom={2.5}></Leaflet>
-        </div>
-
-        <div id="popup-overlay">
-            <div class="popup-box">
-                <button class="close-button" on:click={() => blockadePopupA = false}>×</button>
-                <div>
-                    <h2>Type Country 1</h2>
-                    <input 
-                        id="text-input"
-                        class="thief-selection-input"
-                        type="text"
-                        bind:value={blockadeInput}
-                        placeholder="Enter country name..."
-                    />
-
-                    <button class="button-54" on:click={blockadeHandleSubmitInput}>Confirm</button>
-                </div>
             </div>
             
         </div>
