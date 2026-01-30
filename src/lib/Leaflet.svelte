@@ -14,6 +14,7 @@
         if (!mapElement) return; // Ensure the element exists
 
         map = new L.Map(mapElement);
+        map.doubleClickZoom.disable();
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> | &copy; <a href="https://carto.com/attributions">CartoDB</a>'
