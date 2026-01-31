@@ -1,5 +1,6 @@
 export const coords: { [key: string]: [number, number] } = {
     "Antarctica": [-90.0, 0.0],
+    "Malta": [35.8992, 14.5141],
     "New Zealand": [-40.9006, 174.8860],
     "Afghanistan": [33.93911, 67.709953],
     "Albania": [41.153332, 20.168331],

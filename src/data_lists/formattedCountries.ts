@@ -4,6 +4,7 @@ export const formattedCountries = [
     {"name":"Algeria", "code":"DZA"},
     {"name":"Andorra", "code":"AND"},
     {"name":"Angola", "code":"AGO"},
+    {"name":"Malta", "code":"MLT"},
     {"name":"Argentina", "code":"ARG"},
     {"name":"Armenia", "code":"ARM"},
     {"name":"Antarctica", "code":"ATA"},
