@@ -692,3 +692,127 @@ select:focus-visible {
   flex-direction: column;
   gap: 1rem;
 }
+
+/* ===== HOW TO PLAY OVERLAY ===== */
+#info-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(12, 18, 34, 0.88);
+  backdrop-filter: blur(2px);
+}
+
+/* Large briefing-style panel */
+#info-overlay .info-box {
+  position: relative;
+
+  width: 60vw;
+  max-width: 1100px;
+  height: 80vh;
+
+  background: linear-gradient(165deg, #1a2744 0%, #131d33 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Scrollable content area */
+#info-overlay .info-content {
+  flex: 1;
+  padding: 2.25rem 2.5rem;
+  overflow-y: auto;
+}
+
+/* Scrollbar matches info panel style */
+#info-overlay .info-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+#info-overlay .info-content::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+#info-overlay .info-content::-webkit-scrollbar-thumb {
+  background: var(--bg-panel-light);
+  border-radius: 3px;
+}
+
+#info-overlay h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  color: orange;
+}
+
+#info-overlay h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 2rem 0 0.5rem;
+  color: var(--accent);
+}
+
+#info-overlay p {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 0.5rem 0;
+}
+
+#info-overlay strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+#info-overlay table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+#info-overlay th,
+#info-overlay td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+#info-overlay th {
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+#info-overlay td {
+  color: var(--text);
+}
+
+#info-overlay img {
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  #info-overlay .info-box {
+    width: 92vw;
+    height: 90vh;
+  }
+
+  #info-overlay .info-content {
+    padding: 1.75rem 1.5rem;
+  }
+}

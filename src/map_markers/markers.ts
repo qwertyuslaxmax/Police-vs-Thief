@@ -13,7 +13,7 @@ export const dummyMarker: LatLngExpression[] = [[0, 0]];
 
 export function editMarkerLocations(
     thiefCountry: string,
-    thiefPrevious: string,
+    thiefDisplay: string,
     dummyCountry: string,
     police1: Police,
     police2: Police
@@ -30,8 +30,8 @@ export function editMarkerLocations(
         dummyMarker[0] = [0, 0];
     }
 
-    if (thiefPrevious && coords[thiefPrevious]) {
-        policeThiefPreviousMarker[0] = coords[thiefPrevious];
+    if (thiefDisplay && coords[thiefDisplay]) {
+        policeThiefPreviousMarker[0] = coords[thiefDisplay];
     } else {
         policeThiefPreviousMarker[0] = [0, 0];
     }

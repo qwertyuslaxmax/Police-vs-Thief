@@ -78,7 +78,7 @@ export const formattedCountries = [
     {"name":"Kazakhstan", "code":"KAZ"},
     {"name":"Kenya", "code":"KEN"},
     {"name":"North Korea", "code":"PRK"},
-    {"name":"Korea", "code":"KOR"},
+    {"name":"South Korea", "code":"KOR"},
     {"name":"Kuwait", "code":"KWT"},
     {"name":"Kyrgyzstan", "code":"KGZ"},
     {"name":"Laos", "code":"LAO"},

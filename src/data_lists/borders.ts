@@ -66,6 +66,7 @@ export const borders: Record<string, string[]> = {
     "Guinea": ["Cote d'Ivoire", "Guinea-Bissau", "Liberia", "Mali", "Senegal", "Sierra Leone"],
     "Guinea-Bissau": ["Guinea", "Senegal"],
     "Guyana": ["Brazil", "Suriname", "Venezuela"],
+    "Malta": ["Italy", "Tunisia"],
     "Honduras": ["El Salvador", "Guatemala", "Nicaragua"],
     "Hungary": ["Austria", "Croatia", "Romania", "Serbia", "Slovakia", "Slovenia", "Ukraine"],
     "India": ["Bangladesh", "Bhutan", "China", "Myanmar", "Nepal", "Pakistan"],

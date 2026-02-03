@@ -14,6 +14,7 @@
     let message = ""; //Universal usage error message
     let turnNumber = 0; //Keeps track of # of turns (used for thiefDisplay)
     let dummyRandomizer = 0.5;
+    let seaPopup = false;
 
     let prepare = 0; //Variable that represents readiness for robbery
     let cash = 200; //Used for moving as well as end goal (tbi)
@@ -30,6 +31,8 @@
     const sleep = ms => new Promise(r => setTimeout(r, ms));
     let actionsOpen = false;
     let policeForce = "Interpol"
+    let heatedCountries = [];
+    let howToPopup = false;
 
     let robbedCountries: string[] = [];
 
@@ -154,12 +157,15 @@
                 failedRobbery = true;
                 skipVar += 1;
             }
-            gameState = "failedRobbery";
+            gameState = "maskScreen";
             whoseTurnNext = "Police";
+            message = "The Robbery Failed. You will be detained for two rounds. Don't let the police know!";
+            setTimeout(() => (message = ""), 7000);
             return;
         }
 
         thiefCountry = thiefSelectedCountry;
+        heatedCountries.push(thiefCountry);
 
         if (blockadeDuration > 0) {
             blockadeDuration -= 1;
@@ -186,8 +192,19 @@
             prepare += 1;
         }
 
+        let abc = getBorderingCountries(thiefPrevious);
+        abc.push(thiefPrevious);
+
         if (turnNumber % 3 == 0) {
-            thiefDisplay = thiefPrevious;
+            let count = 0;
+            for (const x of heatedCountries) {
+                if (x === thiefPrevious) count++;
+            }
+            if (count <= 3) {
+                thiefDisplay = shuffle(abc)[0];
+            } else {
+                thiefDisplay = thiefPrevious;
+            }
         } else {
             thiefDisplay = "???";
         }
@@ -202,7 +219,7 @@
             return;
         }
 
-        editMarkerLocations(thiefCountry, thiefPrevious, dummyCountry, police1, police2);
+        editMarkerLocations(thiefCountry, thiefDisplay, dummyCountry, police1, police2);
         whoseTurnNext = "Police"
         gameState = "mask-screen";
     }
@@ -398,6 +415,8 @@
         }
 
         editMarkerLocations(thiefCountry, thiefPrevious, dummyCountry, police1, police2);
+        heatedCountries.push(police1.location);
+        heatedCountries.push(police2.location);
         whoseTurnNext = "Thief";
         gameState = "mask-screen";
     }
@@ -450,7 +469,7 @@
 
             dummyReset = (3 - (turnNumber % 3)) % 3;
             if (dummyReset === 0) dummyReset = 3;
-            dummyCooldown = 10;
+            dummyCooldown = 8;
         }
 
         dummyPopup = false;
@@ -700,7 +719,7 @@
     </div>
 {/if}
 
-{#if gameState == "multiplayer-menu" || gameState == "thiefMove"}
+{#if (gameState == "multiplayer-menu" || gameState == "thiefMove")  && (blockadePopupA != true && investigationPopup != true && blockadePopupB != true && howToPopup != true && seaPopup != true)}
     <div class="game-screen">
     <!-- TOP ACTION BAR -->
     <header class="top-bar">
@@ -770,14 +789,26 @@
         <!-- MAP -->
         <main class="map-area">
             <Leaflet view={initialView} zoom={1.8}>
-                <Geodata
-                    availableCountries={thiefBorderingCodes}
-                    onSelect={(code) => {
-                        // This will only be called on second click
-                        thiefSelectedCountry = getName(code); // store the selected country
-                        thiefHandleSubmitDropdown();          // immediately trigger the move
-                    }}
-                />
+                {#if failedRobbery}
+                    <Geodata
+                        availableCountries={[thiefCountry]}
+                        onSelect={(code) => {
+                            // This will only be called on second click
+                            thiefSelectedCountry = getName(code); // store the selected country
+                            thiefHandleSubmitDropdown();          // immediately trigger the move
+                        }}
+                    />
+                {:else}
+                    <Geodata
+                        availableCountries={thiefBorderingCodes}
+                        onSelect={(code) => {
+                            // This will only be called on second click
+                            thiefSelectedCountry = getName(code); // store the selected country
+                            thiefHandleSubmitDropdown();          // immediately trigger the move
+                        }}
+                    />
+                {/if}
+                
                 {#each thiefCountryMarker as latLng}
                     <Marker {latLng} width={40} height={40}>
                         <svg
@@ -829,7 +860,7 @@
     </div>
 {/if}
 
-{#if gameState == "policeMove1" || gameState == "policeMove2"}
+{#if (gameState == "policeMove1" || gameState == "policeMove2") && (blockadePopupA != true && investigationPopup != true && blockadePopupB != true && howToPopup != true && seaPopup != true)}
     <div class="game-screen">
         <header class="top-bar">
             <div class="top-left">
@@ -1052,8 +1083,8 @@
   <div class="panel-backdrop" tabindex="0" role="button" aria-label="Close actions panel" on:click={() => actionsOpen = false} on:keydown={(e) => {if (e.key === 'Enter' || e.key === ' ') {actionsOpen = false;}}}>
     <aside class="actions-panel">
       <button on:click={dummyOpenPopup}>Place Dummy</button>
-      <button>Paths Reference Sheet</button>
-      <button>How to Play?</button>
+      <button on:click={() => (seaPopup = true)}>View Path References</button>
+      <button on:click={() => (howToPopup = true)}>How to Play?</button>
 
       <h3>Boss Home</h3>
       <p>{bossHome}</p>
@@ -1067,8 +1098,8 @@
       <button on:click={blockadeOpenPopup}>Set up Blockade</button>
       <button on:click={investigateOpenPopup}>Investigate for Boss Location</button>
       <button on:click={emergencyFunds}>Request Emergency Funding</button>
-      <button>Paths Reference Sheet</button>
-      <button>How to Play?</button>
+      <button on:click={() => (seaPopup = true)}>View Path References</button>
+      <button on:click={() => (howToPopup = true)}>How to Play?</button>
     </aside>
   </div>
 {/if}
@@ -1141,6 +1172,109 @@
                 {/if}
             </div>
             
+        </div>
+    </div>
+{/if}
+
+{#if howToPopup || seaPopup}
+    <div>
+        <div class="fullscreen-map">
+            <Leaflet view={view1} zoom={2.5} />
+        </div>
+
+        <div id="info-overlay">
+            <div class="info-box">
+                <button
+                    class="close-button"
+                    on:click={() => {howToPopup = false; seaPopup = false}}
+                >
+                    ×
+                </button>
+
+                {#if howToPopup}
+                    <div class="info-content">
+                        <h1>How to Play</h1>
+
+                        <p>
+                            The <strong>Thief</strong> attempts to rob countries while avoiding
+                            two police units across a live world map.
+                        </p>
+
+                        <h2>Location Intel</h2>
+
+                        <p>
+                            Gameplay revolves around location intelligence. The thief is able to get the location of the
+                            officers' previous positions every round, while police officers are constrained to the same
+                            data every three rounds.
+                        </p>
+                        <p>
+                            However, it still remains very difficult for the thief to gain enough distance to make safe robberies
+                            as the two police officers can cover the map very well if used correctly. Any mistakes from the thief
+                            can end the game while the police is given more room to breath.
+                        </p>
+                        <p>
+                            Therefore, as a balancing factor, police data can sometimes be unreliable. If a country has been used less
+                            than four times throughout the game and the thief is positioned upon it at the time police data is collected,
+                            the police will see the thief's location not necessarily as it was, but as a country close to, as in bordering
+                            it. Below is an example to illustrate this mechanic.
+                        </p>
+                        <p>
+                            <strong>Round 25:</strong>
+                        </p>
+                        <p>
+                            Police officers, situated in Peru and New Zealand, receive no intelligence. In anticipation, officer one
+                            moves to Colombia while officer two moves to Antarctica. Next, the thief, situated in Honduras, moves to Guatemala.
+                        </p>
+                        <p>
+                            <strong>Round 26:</strong>
+                        </p>
+                        <p>
+                            Police officers, situated in Colombia and Antarctica, receive no intelligence. In anticipation, officer one
+                            moves to Panama while officer two moves to Chile. The thief receives their previous positions, New Zealand and
+                            Peru, then proceeds to move to Mexico.
+                        </p>
+                        <p>
+                            <strong>Round 27:</strong>
+                        </p>
+                        <p>
+                            Police officers receive intelligence as the turn is a multiple of three. They see that the thief was in Guatemala.
+                            However, unreliable data may cause them to see any country that Guatemala borders too. If Guatemala had been
+                            crossed at least four times, then they would see correct data. Therefore, police officers must always keep
+                            a keen eye on what countries have been used and which ones haven't been used. In order to get better data
+                            accross the board, the police may chose to travel to unused locations to increase reliability.
+                        </p>
+                        <table>
+                            <thead>
+                                <tr>
+                                <th>Role</th>
+                                <th>Intel Update</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                <td>Thief</td>
+                                <td>Every turn</td>
+                                </tr>
+                                <tr>
+                                <td>Police</td>
+                                <td>Every 3 turns</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h2>Robberies</h2>
+                        <p>
+                            Section will be expanded.
+                        </p>
+
+                        <img src="/howto/robbery-example.png" alt="Robbery example" />
+                    </div>
+                {:else}
+                    <div class="info-content">
+                        <h1>Maritime and Unusual Borders / Paths</h1>
+                    </div>
+                {/if}
+            </div>
         </div>
     </div>
 {/if}
