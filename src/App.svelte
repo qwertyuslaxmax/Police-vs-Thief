@@ -1264,7 +1264,58 @@
 
                         <h2>Robberies</h2>
                         <p>
-                            Section will be expanded.
+                            Robberies are the primary method by which the thief generates wealth. Each successful robbery earns the
+                            thief $200. The thief starts the game with $200 and must end it with at least $1000 to satisfy its win
+                            condition.
+                        </p>
+                        <p>
+                            <strong>Robbery Success Rates</strong> are determined by two factors, both based on the thief's
+                            preparation. Preparation is set at 0 by default, and increases by one every time the thief stays put
+                            within a country. Once a robbery is conducted, prepare resets not to zero but to negative four, acting
+                            as a robbery cooldown. The second factor is whether the thief's boss has already done some preparation
+                            for the thief. There will be ten countries like this, known as boss locations. Robbery of a boss location
+                            will generally yield more success for the thief. Below is a table to illustrate this:
+                        </p>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                <th>Prepare</th>
+                                <th>0</th>
+                                <th>1</th>
+                                <th>2</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                <td>Boss Location</td>
+                                <td>60%</td>
+                                <td>95%</td>
+                                <td>95%</td>
+                                </tr>
+                                <tr>
+                                <td>Not Boss Location</td>
+                                <td>10%</td>
+                                <td>50%</td>
+                                <td>95%</td>
+                                <tr>
+                            </tbody>
+                        </table>
+
+                        <p>
+                            <strong>Robbery Failure</strong> causes the thief to be detained for two turns at the location of the
+                            robbery. The police won't be explicitly notified of this, however, they will see the thief's location 
+                            if he's detained.
+                        </p>
+                        <p>
+                            <strong>The thief wins </strong> by going to the boss's home with at least $1000. Robberies are the only
+                            way for the thief to earn money, but the thief can also lose money. Every movement (not turn) costs the
+                            thief $20.
+                        </p>
+                        <p>
+                            <strong>The thief can place a dummy</strong> to split the attention of the police between two locations:
+                            what would normally be shown, and the dummy location. The dummy will only be shown once, and while it
+                            does not cost the thief any cash amount, it comes with a cooldown limiting its use.
                         </p>
 
                         <img src="/howto/robbery-example.png" alt="Robbery example" />
@@ -1273,6 +1324,26 @@
                     <div class="info-content">
                         <h1>Maritime and Unusual Borders / Paths</h1>
                     </div>
+                    <h2>Maritime Connections</h2>
+                    <p><strong>Spain - Morocco</strong></p>
+                    <p><strong>Italy - Malta - Tunisia</strong></p>
+                    <p><strong>Saudi Arabia - Egypt</strong></p>
+                    <p><strong>Yemen - Djibouti</strong></p>
+                    <p><strong>Iran - UAE</strong></p>
+                    <p><strong>Malaysia - Singapore - Indonesia (cyclic)</strong></p>
+                    <p><strong>Indonesia - Australia - New Zealand - Antarctica</strong></p>
+                    <p><strong>Papua New Guinea - Australia</strong></p>
+                    <p><strong>South Africa - Antarctica</strong></p>
+                    <p><strong>Chile - Antarctica</strong></p>
+                    <p><strong>USA - Cuba - Mexico (cyclic)</strong></p>
+                    <p><strong>USA - Russia</strong></p>
+                    <p><strong>Russia - Japan - South Korea</strong></p>
+                    <p><strong>Azerbaijan - Turkmenistan</strong></p>
+                    <h2>Other Unusual Borders</h2>
+                    <p><strong>Suriname - France - Brazil</strong></p>
+                    <p><strong>Netherlands - France</strong></p>
+                    <p><strong>Poland - Russia</strong></p>
+                    <p><strong>Sweden - Denmark - Canada</strong></p>
                 {/if}
             </div>
         </div>
