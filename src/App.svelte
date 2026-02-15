@@ -157,10 +157,12 @@
                 failedRobbery = true;
                 skipVar += 1;
             }
-            gameState = "maskScreen";
-            whoseTurnNext = "Police";
+
             message = "The Robbery Failed. You will be detained for two rounds. Don't let the police know!";
-            setTimeout(() => (message = ""), 7000);
+            setTimeout(() => (message = ""), 5500);
+            editMarkerLocations(thiefCountry, thiefDisplay, dummyCountry, police1, police2);
+            whoseTurnNext = "Police"
+            gameState = "mask-screen";
             return;
         }
 
@@ -705,20 +707,6 @@
     </div>
 {/if}
 
-{#if gameState == "failedRobbery"}
-    <div class="mask-screen">
-        <div class="fullscreen-map">
-            <Leaflet view={view1} zoom={2.5}></Leaflet>
-        </div>
-        <div class="mask-overlay">
-            <div class="mask-card">
-                <p class="mask-message">Robbery failed. Transfer device to <strong>{whoseTurnNext}</strong></p>
-                <button class="btn-move-on" on:click={handleNextTurn}>Move On</button>
-            </div>
-        </div>
-    </div>
-{/if}
-
 {#if (gameState == "multiplayer-menu" || gameState == "thiefMove")  && (blockadePopupA != true && investigationPopup != true && blockadePopupB != true && howToPopup != true && seaPopup != true)}
     <div class="game-screen">
     <!-- TOP ACTION BAR -->
@@ -938,20 +926,19 @@
             <main class="map-area">
                 <Leaflet view={initialView} zoom={1.8}>
                     {#if gameState == "policeMove1"}
-                    <Geodata
-                        availableCountries={police1BorderingCodes}
-                        onSelect={(code) => {
-                            police1selectedCountry = getName(code);
-                            police1handleSubmit();
-                        }}
-                    />
+                        <Geodata
+                            availableCountries={police1BorderingCodes}
+                            onSelect={(code) => {
+                                police1selectedCountry = getName(code);
+                                police1handleSubmit();
+                            }}
+                        />
                     {:else}
                         <Geodata
                         availableCountries={police2BorderingCodes}
                         onSelect={(code) => {
-                            // This will only be called on second click
-                            police2selectedCountry = getName(code); // store the selected country
-                            police2handleSubmit();          // immediately trigger the move
+                            police2selectedCountry = getName(code);
+                            police2handleSubmit();
                         }}
                         />
                     {/if}

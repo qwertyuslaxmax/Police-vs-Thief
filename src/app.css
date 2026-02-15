@@ -47,7 +47,7 @@ html, body {
   height: 100%;
   border: none;
   object-fit: cover;
-  filter: brightness(0.67) saturate(0.85);
+  filter: brightness(0.76) saturate(0.85);
 }
 
 /* ===== POPUP OVERLAY (MENU) ===== */
