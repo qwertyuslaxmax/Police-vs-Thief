@@ -1302,10 +1302,60 @@
                         <p>
                             <strong>The thief can place a dummy</strong> to split the attention of the police between two locations:
                             what would normally be shown, and the dummy location. The dummy will only be shown once, and while it
-                            does not cost the thief any cash amount, it comes with a cooldown limiting its use.
+                            does not cost the thief any cash amount, it comes with a cooldown limiting its use. Below is an example
+                            of what the police may see on their turn.
+                        </p>
+                        <img src="/howToMap.png" alt="Dummy Visual" />
+
+                        <h2>Police Credibility and Funding</h2>
+
+                        <p>
+                            Almost every action taken by the police requires some cash amount to be paid. While the police, unlike
+                            the thief, can't rob countries, they can indirectly influence the amount of funding they receive.
+                            Credibility is the primary way in which trust in the police is measured in this game. It's influenced
+                            by two factors, distance to the thief, and the amount of countries robbed per turn.
+                        </p>
+                        <p>
+                            If the closest police officer is close to the thief, there will be a gradual increase in credibility.
+                            If the closest police officer is far away from the thief, there will be a gradual decrease. The number
+                            of ccountries robbed per turn impacts credibility equally to the distance factor, and works in a similar
+                            way in which more robberies will decrease credibility and less will increase it.
+                        </p>
+                        <p>
+                            A credibility of 1 will prevent losses, and the intial value of 0 will lead to a net loss of $20 for
+                            the police. Higher credibilities will lead to more funding in general.
+                        </p>
+                        <p>
+                            In addition, extremely low credibility will prevent police officers from entering certain countries.
+                            For now, these countries are predetermined and not influenced by the players. Below is the list:
+                        </p>
+                        <p>Blocked at -3: Russia, China, Iran, Venezuela, North Korea</p>
+                        <p>Blocked at -4: Turkey, Indonesia, Malaysia, Egypt, Morocco, Bolivia, + above</p>
+
+                        <p>{blank}</p>
+                        <p><strong>How to manage credibilty?</strong></p>
+                        <p>
+                            By now, you may have realized that lower credibility will lead to a perpetual cycle of losing
+                            credibility. The answer lies in regrouping rather than pushing aimlessly forward. Credbility will
+                            increase by two each turn (with a cap at 0) if both police officers are situted in the same jurisdiction. While this
+                            will likely put the police in a worse position geographically, there are instances where it will be
+                            the best strategic move. Use this power wisely.
+                        </p>
+                        <p>
+                            The police may also request emergency funding if funds go into the negatives. This package of $500 may help
+                            as a short term relief, however, it will decrease credbility and therefore should not be relied on for long term
+                            success. If funds go below -$500, the police will be shut down in order to prevent further losses. This
+                            results in the thief's vitory.
                         </p>
 
-                        <img src="/howto/robbery-example.png" alt="Robbery example" />
+                        <p>{blank}</p>
+                        <p><strong>What to use funding for?</strong></p>
+                        <p>
+                            The police may use their funds on two things besides the costs of each normal turn. They may investigate
+                            locations or place blockades. Investigations will often be a minor dent, but blocaked cost $1000, and
+                            unless credibility is managed very effectively, the police may only get to use this power once. Keep in
+                            mind that both of these uses come with cooldowns.
+                        </p>
                     </div>
                 {:else}
                     <div class="info-content">
